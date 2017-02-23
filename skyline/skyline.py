@@ -11,7 +11,8 @@ from mbin import storeRank, storePoints
 from radixselect import findK
 from skydata import genData
 import time
-from pskyline import pskyline_f
+#from pskyline import pskyline_f
+from ksky_mpass import ksky_mpass
 
 MAX_VALUE = 1024 * 1024 * 32
 kss_len = 0
@@ -119,6 +120,8 @@ def kss_test(points,window,rank,pstop):
     global kss_len
     rank2 = [min(points[i]) for i in range(N)]# minimum rank
     
+    ksky_mpass(points,rank)
+    
     ksstime = time.time()
     sky = kss(window,points,rank2,pstop)#
     ksstime = time.time()-ksstime
@@ -169,7 +172,7 @@ for line in fp.readlines():
 
 fp.close()
 
-distr="a"#Choose distribution
+distr="i"#Choose distribution
 points=genData(N,D,distr)
 rank = [sum(points[i]) for i in range(N)]
 
@@ -208,7 +211,7 @@ print "-----------------------------------------------------"
 sk=[]
 sky_ret=[]
 print "Computing the skyline..."
-if False:
+if True:
     sk=sfs_test(points,rank)
     sky_ret=kss_test(points,window,rank,pstop)#points: list of lists, window: indices, rank: values of max dim, pstop: single value min(max(window_points))
     

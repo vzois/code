@@ -54,7 +54,7 @@ def rselect(input,k):
 
 def findK(k,rank):
    nsmall = nsmallest(k,rank)
-   heapK=max(nsmall)
+   heapK= max(nsmall)
    rdxK=rselect(rank,k)
    print "(heapK) k smallest element:", heapK,hex(heapK)
    print "(rdxK) k smallest element:", rdxK,hex(rdxK)

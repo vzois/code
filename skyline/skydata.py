@@ -22,7 +22,7 @@ def genData(N,D,distr):
 ##################################
 # CREATE BINARY FILE
 ##################################
-    scale = 512 # SCALE VALUES
+    scale = 1024 * 32 # SCALE VALUES
     infile = filename
     outfile=filename+".bin"
     f = open(infile,"r")

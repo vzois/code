@@ -4,10 +4,11 @@
 #define MIN(x,y) (x > y ? y : x)
 
 //Dataset Configuration
-#define DATA_N 8192
+#define DATA_N 32768
 #define DPUS 1
 #define N (DATA_N / DPUS)
 #define D 8
+#define L 2
 #define K 128
 #define MERGE_CHUNK 512
 #define BVECTOR_N (N >> 5) // N/32 Bit vectors
