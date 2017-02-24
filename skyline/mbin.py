@@ -53,7 +53,7 @@ def storeDSkyData(parts_p,parts_r,part_i):
     
     print "Storing points in partitions!!!"
     for pp in parts_p:# for each partition
-        if count == 1 and False:
+        if count == 0 and False:
             count=0
             for p in pp:
                 if count % 16 == 0:

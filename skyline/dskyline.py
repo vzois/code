@@ -160,7 +160,10 @@ def dskyline():
     global parts_p,parts_r, parts_i
     
     gsky = []
-    
+    part = 0
+    part_index = 0;
+    total = 0;
+    gsky_i = list()
     for i in range(len(parts_p)):
         pp=parts_p[i]
         rp=parts_r[i]
@@ -169,7 +172,7 @@ def dskyline():
         #for j in tsky:
         #    print pp[j]
         #print tsky
-        
+    
         for j in tsky:
             q = pp[j]
             dt = 0
@@ -180,8 +183,16 @@ def dskyline():
                     break
             
             if dt == 0:
+                gsky_i.append(j+total)
                 gsky.append(q)
         
+        if part_index < 1 or (len(gsky_i) > 0):
+            print "<",part_index,">",
+            print gsky_i
+                
+        part_index+=1
+        total+=len(tsky)
+        gsky_i = list()
         #break
     #print gsky
     print "dkyline len:",len(gsky)
@@ -208,7 +219,7 @@ fp.close()
         
     
 
-distr="a"#Choose distribution
+distr="c"#Choose distribution
 points=genData(N,D,distr)
 rank = [sum(points[i]) for i in range(N)]
 
@@ -228,6 +239,7 @@ else:
     print "Creating Partitions..."
     dskyline_t = time.time()
     createPartitions(points,rank)
+    dskyline()
     dskyline_t = time.time() - dskyline_t
     print "create partitions elapsed time:",dskyline_t
 

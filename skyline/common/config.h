@@ -7,7 +7,7 @@
 #define DATA_N 8192
 #define DPUS 1
 #define N (DATA_N / DPUS)
-#define D 16
+#define D 4
 #define PSIZE 256 //Partition size
 #define L 2 // Partition level
 #define P (DATA_N / PSIZE) // Partition number
@@ -54,11 +54,14 @@
 ////////////////////////////////////////////
 #define DSKY_POINTS_ADDR
 #define DSKY_RANK_ADDR (POINTS_ADDR + ((N * D)<<2))
+#define FLAGS_ADDR 0x3204000
+#define SKY_PART_ADDR 0x3804000
+#define SKY_PART_FLAGS_ADDR 0x380B000
 
 #define POINTS_PER_T (PSIZE / TASKLETS)
 #define POINTS_PER_T_VALUES ( POINTS_PER_T * D )
 #define POINTS_PER_T_BYTES ( POINTS_PER_T_VALUES << 2)
-
+#define POINTS_PER_T_MSK ( (0x1 << POINTS_PER_T) - 1)
 #define PSIZE_POINTS_VALUES (PSIZE * D)
 
 
