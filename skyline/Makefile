@@ -39,11 +39,22 @@ M_EXEC=kskyline_merge
 M_SYMS=kskyline_merge.syms
 M=kernels/kskyline_merge.c
 
+##
+#	dskyline kernel
+##
+DSKY=kernels/dskyline.c
+DSKY_EXEC=dskyline
+DSKY_SYMS=dskyline.syms
+DSKY_CONFIG=dskyline_x
+
 all: px16s kss16s merge16s hh
 	
 hh:
 	gcc -Wall -O3 -I$(HOST_INC) $(HOST_CODE) -o $(HOST_EXEC) -ldpu -ldpusimcore -lpthread
-	
+
+dsky:
+	$(CC) -b -C $(DSKY_CONFIG)16s.json -o $(DSKY_EXEC) -xs $(DSKY_SYMS) $(DSKY)
+
 x16s:
 	$(CC) -b -C $(RDX_CONFIG)16s.json -o $(RDX_EXEC) -xs $(SSYMS) $(SRDX)
 	
@@ -70,6 +81,8 @@ clean:
 	rm -rf runtime_data/points.bin
 	rm -rf runtime_data/sum.bin
 	rm -rf candidates0.bin
+	rm -rf dskyline.bin
+	rm -rf dskyline.syms
 	
 	
 	

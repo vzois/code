@@ -4,11 +4,13 @@
 #define MIN(x,y) (x > y ? y : x)
 
 //Dataset Configuration
-#define DATA_N 32768
+#define DATA_N 8192
 #define DPUS 1
 #define N (DATA_N / DPUS)
-#define D 8
-#define L 2
+#define D 16
+#define PSIZE 256 //Partition size
+#define L 2 // Partition level
+#define P (DATA_N / PSIZE) // Partition number
 #define K 128
 #define MERGE_CHUNK 512
 #define BVECTOR_N (N >> 5) // N/32 Bit vectors
@@ -45,6 +47,21 @@
 #define WINDOW_ADDR (POINTS_ADDR + ((N * D)<<2))
 #define RANK_ADDR (WINDOW_ADDR + ((K * D)<<2))
 #define MASK_ADDR 0x3000000
+
+
+////////////////////////////////////////////
+//dskyline Runtime Configuration
+////////////////////////////////////////////
+#define DSKY_POINTS_ADDR
+#define DSKY_RANK_ADDR (POINTS_ADDR + ((N * D)<<2))
+
+#define POINTS_PER_T (PSIZE / TASKLETS)
+#define POINTS_PER_T_VALUES ( POINTS_PER_T * D )
+#define POINTS_PER_T_BYTES ( POINTS_PER_T_VALUES << 2)
+
+#define PSIZE_POINTS_VALUES (PSIZE * D)
+
+
 
 ////////////////////////////////////////////
 //merging Runtime Configuration

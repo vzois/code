@@ -48,10 +48,10 @@ def ksky_mpass(points,sum):
         psum = [psum[i] for i in sky]
         ppoints = [ppoints[i] for i in sky]
         #print "ppoints size:",len(ppoints)
+        if size == len(ppoints) or K == len(ppoints)-1:
+            break
         K = min(K << 1,len(ppoints)-1)
         print "K:",K
-        if size == len(ppoints):
-            break
         size = len(ppoints)
         iter = iter + 1
     print "ppoints size:",len(ppoints)

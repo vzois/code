@@ -151,9 +151,7 @@ def BvDT(p, Bp, q, Bq):
         m <<= shfG
     DTi |= (sLp & sLq)
     print  "final:"," DTi:",DTi, "DTd:", DTd
-    
-    
-
+      
 def bvector_skyline(pbv):
     global N,D,L
     pad = (L << 1)*(D >> 1)
@@ -249,6 +247,8 @@ rank = [sum(points[i]) for i in range(N)]
 #sky_sfs=sfs(points,rank)
 #print "first point sfs:",sky_sfs[0]
 pskyline_f(points,rank)
+
+
     
     
     

@@ -22,9 +22,7 @@ def storeRank(rank,num):
     f.write(struct.pack('i', mN))
     
     f.close()
-
-
-    
+ 
 def storePoints(points,rank,window,pstop):
     f = open("runtime_data/points.bin","wb")
     
@@ -45,5 +43,41 @@ def storePoints(points,rank,window,pstop):
     
     f.close()
 
+def storeDSkyData(parts_p,parts_r,part_i):
+    f = open("runtime_data/dsky.bin","wb")
+    for i in range(1024):
+        f.write(struct.pack('i', 0x0))
+    
+    count = 0
+    printc = 10
+    
+    print "Storing points in partitions!!!"
+    for pp in parts_p:# for each partition
+        if count == 1 and False:
+            count=0
+            for p in pp:
+                if count % 16 == 0:
+                    print "count",count/16
+                count+=1
+                for d in p:
+                    print hex(d),
+                print""
+        for p in pp:# for each point in the partition
+            for d in p:# write binary file of points
+                f.write(struct.pack('i', d))
+        count+=1
+    
+    count = 0
+    print "Storing ranks in partitions!!!"
+    for pr in parts_r:
+        if count < printc and False:
+            print hex(pr[0])
+        for r in pr:
+            f.write(struct.pack('i', r))
+        count+=1
+        
+    
+    f.close()
+    
         
     
