@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #define MIN(x,y) (x > y ? y : x)
+#define MAX(x,y) (x > y ? x : y)
 
 //Dataset Configuration
 #define DATA_N 8192
@@ -9,6 +10,7 @@
 #define N (DATA_N / DPUS)
 #define D 4
 #define PSIZE 256 //Partition size
+#define PSIZE_SHF 8
 #define L 2 // Partition level
 #define P (DATA_N / PSIZE) // Partition number
 #define K 128
@@ -20,6 +22,7 @@
 #define BUFFER 1024
 #define BINS 17
 #define TASKLETS 16
+#define TASKLETS_SHF 4
 #define ACC_BUCKET 0
 
 //Radix Select Addresses
@@ -52,16 +55,16 @@
 ////////////////////////////////////////////
 //dskyline Runtime Configuration
 ////////////////////////////////////////////
-#define DSKY_POINTS_ADDR
-#define DSKY_RANK_ADDR (POINTS_ADDR + ((N * D)<<2))
-#define FLAGS_ADDR 0x3204000
-#define SKY_PART_ADDR 0x3804000
-#define SKY_PART_FLAGS_ADDR 0x380B000
+#define DSKY_POINTS_ADDR 0x4000// Starting offset of point partitions
+#define DSKY_RANK_ADDR (POINTS_ADDR + ((N * D)<<2))//Precomputed rank for each point within each partition
+#define DSKY_PART_ALIVE_COUNT ( DSKY_RANK_ADDR + (N << 2) )//?
+#define FLAGS_ADDR 0x331F000//Flags to determine which points are alive or not
+#define DSKY_REMOTE_PART_ADDR 0x332F000//Remote partition during communication stage
 
 #define POINTS_PER_T (PSIZE / TASKLETS)
 #define POINTS_PER_T_VALUES ( POINTS_PER_T * D )
 #define POINTS_PER_T_BYTES ( POINTS_PER_T_VALUES << 2)
-#define POINTS_PER_T_MSK ( (0x1 << POINTS_PER_T) - 1)
+#define POINTS_PER_T_MSK ( (0x1 << POINTS_PER_T) - 1 )
 #define PSIZE_POINTS_VALUES (PSIZE * D)
 
 

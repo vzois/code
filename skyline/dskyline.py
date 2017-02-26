@@ -7,6 +7,7 @@ import operator
 import time
 
 from mbin import storeDSkyData
+from skydata import scale
 
 N=0
 D=0
@@ -158,21 +159,21 @@ def sfs_p(points, rank):
 
 def dskyline():
     global parts_p,parts_r, parts_i
+    global PSIZE
     
     gsky = []
     part = 0
     part_index = 0;
     total = 0;
     gsky_i = list()
+    g_ps = 0xFFFFFFFF
     for i in range(len(parts_p)):
         pp=parts_p[i]
         rp=parts_r[i]
         ip=parts_i[i]
+        if g_ps <= rp[0] :
+            break
         tsky = sfs_p(pp,rp)
-        #for j in tsky:
-        #    print pp[j]
-        #print tsky
-    
         for j in tsky:
             q = pp[j]
             dt = 0
@@ -183,18 +184,18 @@ def dskyline():
                     break
             
             if dt == 0:
+                g_ps=min([max(pp[j]),g_ps])
+                
                 gsky_i.append(j+total)
                 gsky.append(q)
         
-        if part_index < 1 or (len(gsky_i) > 0):
-            print "<",part_index,">",
+        if (part_index < 1 or (len(gsky_i) > 0)) and True:
+            print "{",hex(g_ps),"}<",part_index,">",
             print gsky_i
                 
         part_index+=1
-        total+=len(tsky)
+        total+=PSIZE
         gsky_i = list()
-        #break
-    #print gsky
     print "dkyline len:",len(gsky)
  
 print "Generating data...."    
@@ -217,13 +218,15 @@ for line in fp.readlines():
 
 fp.close()    
         
-    
+print "scale factor:",scale    
 
-distr="c"#Choose distribution
+distr="i"#Choose distribution
 points=genData(N,D,distr)
-rank = [sum(points[i]) for i in range(N)]
+rank = [min(min(points[i]),sum(points[i])) for i in range(N)]
+#rank = [sum(points[i]) for i in range(N)]
+#rank = [min(points[i]) for i in range(N)]
 
-if False:
+if True:
     dskyline_t = time.time()
     createPartitions(points,rank)
     dskyline()
@@ -239,7 +242,7 @@ else:
     print "Creating Partitions..."
     dskyline_t = time.time()
     createPartitions(points,rank)
-    dskyline()
+    #dskyline()
     dskyline_t = time.time() - dskyline_t
     print "create partitions elapsed time:",dskyline_t
 
