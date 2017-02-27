@@ -8,7 +8,7 @@
 #define DATA_N 8192
 #define DPUS 1
 #define N (DATA_N / DPUS)
-#define D 4
+#define D 8
 #define PSIZE 256 //Partition size
 #define PSIZE_SHF 8
 #define L 2 // Partition level
@@ -56,7 +56,7 @@
 //dskyline Runtime Configuration
 ////////////////////////////////////////////
 #define DSKY_POINTS_ADDR 0x4000// Starting offset of point partitions
-#define DSKY_RANK_ADDR (POINTS_ADDR + ((N * D)<<2))//Precomputed rank for each point within each partition
+#define DSKY_RANK_ADDR (DSKY_POINTS_ADDR + ((N * D)<<2))//Precomputed rank for each point within each partition
 #define DSKY_PART_ALIVE_COUNT ( DSKY_RANK_ADDR + (N << 2) )//?
 #define FLAGS_ADDR 0x331F000//Flags to determine which points are alive or not
 #define DSKY_REMOTE_PART_ADDR 0x332F000//Remote partition during communication stage

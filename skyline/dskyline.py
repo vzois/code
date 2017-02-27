@@ -17,6 +17,10 @@ parts_p=list()
 parts_i=list()
 parts_r=list()
 
+def pfmtb(v):
+    return "{0:#0{1}x}".format(v,10)
+    #return str(format(v, fmt))
+
 def DT(p,q):
     pb = False
     qb = False
@@ -157,6 +161,21 @@ def sfs_p(points, rank):
     
     return sky
 
+def bit_vectors(gsky_i):
+    bv = [0 for i in range(PSIZE/32)]
+    for i in gsky_i:
+        pbit = i & 0x1F
+        ppos = (i & 0xE0) >> 5
+        bv[ppos] = bv[ppos] | (0x1 << pbit)
+        
+    print "<<{"
+    for v in bv:
+        print pfmtb(v) 
+    #[ pfmtb(v) for v in bv ]
+    
+    print "}>>"
+    
+
 def dskyline():
     global parts_p,parts_r, parts_i
     global PSIZE
@@ -190,13 +209,14 @@ def dskyline():
                 gsky.append(q)
         
         if (part_index < 1 or (len(gsky_i) > 0)) and True:
-            print "{",hex(g_ps),"}<",part_index,">",
+            print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
+            bit_vectors(gsky_i)
                 
         part_index+=1
         total+=PSIZE
         gsky_i = list()
-    print "dkyline len:",len(gsky)
+    print "dkyline len:",len(gsky), hex(len(gsky))
  
 print "Generating data...."    
 fp = open("common/config.h","r")
@@ -226,7 +246,7 @@ rank = [min(min(points[i]),sum(points[i])) for i in range(N)]
 #rank = [sum(points[i]) for i in range(N)]
 #rank = [min(points[i]) for i in range(N)]
 
-if True:
+if False:
     dskyline_t = time.time()
     createPartitions(points,rank)
     dskyline()
@@ -242,7 +262,7 @@ else:
     print "Creating Partitions..."
     dskyline_t = time.time()
     createPartitions(points,rank)
-    #dskyline()
+    dskyline()
     dskyline_t = time.time() - dskyline_t
     print "create partitions elapsed time:",dskyline_t
 

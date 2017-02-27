@@ -44,7 +44,7 @@ def storePoints(points,rank,window,pstop):
     f.close()
 
 def storeDSkyData(parts_p,parts_r,part_i):
-    Debug = True
+    Debug = False
     f = open("runtime_data/dsky.bin","wb")
     
     for i in range(4096):
