@@ -8,6 +8,7 @@
 
 uint32_t *buffers[TASKLETS];//1024 * 16 = 16384 bytes
 //uint32_t *pflags[TASKLETS];// 32 * 16 = 512 bytes
+
 uint32_t *pflag;
 uint32_t *qflag;
 
@@ -22,6 +23,7 @@ uint32_t g_ps;
 uint32_t *p_dt;
 uint32_t *level_v;
 uint32_t debug;
+
 uint8_t DT(uint32_t *p, uint32_t *q){
 	uint8_t i = 0;
 	uint8_t pb = 0;
@@ -48,7 +50,7 @@ void init(uint8_t id){
 		qflag = dma_alloc(32);
 		//C_i = dma_alloc(PSIZE *D);
 		//C_j = dma_alloc(PSIZE *D);
-
+		C_i[511]=0x1;
 		debug = 0;
 		g_ps = 0xFFFFFFFF;
 		level_v = dma_alloc(32);
@@ -116,6 +118,22 @@ void load_part(uint8_t id, uint32_t *st, uint32_t i_addr){
 	else if( POINTS_PER_T_BYTES==1024 ){
 		mram_ll_read1024_new(i_addr, buffer);
 		for(i = 0 ; i < 256 ; i++) st[i] = buffer[i];
+	}
+}
+
+void load_point(uint32_t *st, uint32_t addr){
+	switch(D){
+		case 4:
+			mram_ll_read32(addr,st);
+			break;
+		case 8:
+			mram_ll_read32(addr,st);
+			break;
+		case 16:
+			mram_ll_read64(addr,st);
+			break;
+		default:
+			break;
 	}
 }
 
@@ -210,15 +228,13 @@ void cmp_part(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i + tasklet_offset ) * D)<<2 );//Partition i starting addr
 	uint32_t j_addr = DSKY_POINTS_ADDR + ( (( ppos_j + tasklet_offset ) * D)<<2 );//Partition j starting addr
 
-	uint32_t t_offset = POINTS_PER_T_VALUES << 4;//offset for given tasklet to write in window// <<4 => 16 tasklets
+	uint32_t t_offset = POINTS_PER_T_VALUES * id;//offset for given tasklet to write in window// <<4 => 16 tasklets
 	uint32_t i = 0, j =0;
 	uint8_t wid = id >> 1;//group tasklets in pairs to extract flags for partition j
 
 	load_part(id,&C_i[t_offset],i_addr);
 	load_part(id,&C_j[t_offset],j_addr);
 
-	//uint32_t *pflag = pflags[0];
-	//uint32_t *qflag = pflags[1];
 	uint32_t tflag = 0;//local tflag for points that this tasklet is processing
 	uint32_t pflag_offset = FLAGS_ADDR + (cpart_i << 5);
 	uint32_t qflag_offset = FLAGS_ADDR + (cpart_j << 5);
@@ -276,6 +292,95 @@ void cmp_part(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 }
 
+void cmp_part_2(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
+	//Check if partition can be pruned
+	t_ps[id] = 0xFFFFFFFF;
+	if(id == 0) part_dt(cpart_j);
+	barrier_wait(id);
+	if(g_ps <= level_v[0]){//If global pstop is less than level of fist point prune the whole partition
+		if(id < 4) kill_part(id,cpart_j);// this method is not optimal <?>
+		return;
+	}
+
+	uint32_t tasklet_offset = (id << PSIZE_SHF) >> TASKLETS_SHF;
+	uint32_t ppos_i = cpart_i << PSIZE_SHF;//Position of partition i
+	uint32_t ppos_j = cpart_j << PSIZE_SHF;//Position of partition j
+	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i + tasklet_offset ) * D)<<2 );//Partition i starting addr
+	uint32_t j_addr = DSKY_POINTS_ADDR + ( (( ppos_j + tasklet_offset ) * D)<<2 );//Partition j starting addr
+
+	uint32_t t_offset = POINTS_PER_T_VALUES * id;//offset for given tasklet to write in window// <<4 => 16 tasklets
+	uint32_t i = 0, j =0;
+	uint8_t wid = id >> 1;//group tasklets in pairs to extract flags for partition j
+
+	load_part(id,&C_i[t_offset],i_addr);
+	load_part(id,&C_j[t_offset],j_addr);
+
+	uint32_t tflag = 0;//local tflag for points that this tasklet is processing
+	uint32_t pflag_offset = FLAGS_ADDR + (cpart_i << 5);
+	uint32_t qflag_offset = FLAGS_ADDR + (cpart_j << 5);
+	if ( id == 0 ) mram_ll_read32(pflag_offset,pflag); // read flags of C_i set//used by all threads
+	if ( id == 1 ) mram_ll_read32(qflag_offset,qflag); // read flags of C_j set//need to extract portion of tasklet
+	barrier_wait(id);
+	tflag = (id & 0x1) ? (qflag[wid])>>POINTS_PER_T : (qflag[wid] & 0xFFFF);//extract flags of point corresponding to given tasklet
+
+	uint8_t qbit = 0;//16 points per tasklet
+	//uint32_t *qbuffer = buffers[id];
+	//mram_ll_read256(j_addr, qbuffer);
+	//uint32_t j_stride = (D << 2);
+	for(j = 0 ; j < POINTS_PER_T_VALUES; j+=D){//For each point in j partition
+		uint32_t *q = &C_j[t_offset + j];
+		//uint32_t *q = &qbuffer[j];
+		uint8_t alive_q = (tflag >> qbit) & 0x1;
+
+		if(alive_q == 1){//If point has not been pruned yet
+			//uint32_t *q = qbuffer[id];
+			//load_point(q,j_addr);
+			//mram_ll_read32(j_addr,q);
+
+			uint8_t pbit = 0;//32 bits
+			uint32_t ppos = 0;// 256 / 32 = 8 positions
+			uint32_t c = 0;//
+			uint8_t alive_p = 1;
+			uint8_t dt = 0;
+			for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){//Check against each point in i partition
+				uint32_t *p = &C_i[i];
+
+				alive_p = (pflag[ppos] >> pbit) & 0x1;
+				if (alive_p == 1){//If point is still alive check against q
+					if(DT(p,q) == 1){
+						//tflag = tflag ^ (0x1 << qbit);
+						tflag &= ~(0x1 << qbit);//Set flag for dominace
+						dt = 1;
+						break;
+					}
+				}
+				c++;
+				pbit = c & 0x1F;
+				ppos = (c & 0xE0) >> 5;
+			}
+			if (dt == 0) minimax(id,q);//compute new Pstop if q is not dominated => argmin_i max(p_i[j])) from all points in Sky, min (max(dimension))
+		}
+		//j_addr+=j_stride;
+		qbit++;
+	}
+	barrier_wait(id);
+
+	reduce_min(id,t_ps);//Gather all Pstop candidates
+	if(id == 0) g_ps = MIN(t_ps[0],g_ps);//Update Pstop
+	barrier_wait(id);
+
+	//Write bitvectors into mram// Not optimal // Having some problems//
+	mflags[id] = tflag;
+	barrier_wait(id);
+	if(id < 1){
+		for(i = 0 ; i < 16;i+=2){
+			pflag[(i >> 1)] = (mflags[i] & POINTS_PER_T_MSK) | (mflags[i+1] << POINTS_PER_T);
+			mram_ll_write32(pflag,qflag_offset);
+		}
+	}
+	barrier_wait(id);
+}
+
 void count_sky_points(uint32_t p){//Debug Only
 	uint32_t i = 0, j=0;
 	uint32_t pflag_offset = FLAGS_ADDR;
@@ -303,17 +408,10 @@ int main(){
 	uint8_t id = me();
 	init(id);
 	barrier_wait(id);
-
 	int16_t i = 0 , j = 0;
 
-	/*cmp_part(id,0,0);
-	//cmp_part(id,0,1);
-	for(j = i+1 ; j < P; j++){
-		cmp_part(id,0,j);
-	}*/
-
-	uint32_t p = P;
-	cmp_part(id,0,0);
+	/*uint32_t p = P;
+	cmp_part_2(id,0,0);
 	for(i = 1;i<p;i++){
 		for(j = 0;j<i;j++){
 			//if(i == 2 && j == 1) break;
@@ -321,31 +419,13 @@ int main(){
 		}
 		cmp_part(id,i,i);
 	}
-	if (id == 0) count_sky_points(p);
-
-	/*for(i = 0;i<2;i++){
-		cmp_part(id,i,i);
+	if (id == 0) count_sky_points(p);*/
+	cmp_part_2(id,0,0);
+	for(j = 1;j<P;j++){
+		//if(i == 2 && j == 1) break;
+		cmp_part(id,0,j);
 	}
 
-	for(i = 1;i<2;i++){
-		for(j = 0; j < i;j++){
-			cmp_part(id,j,i);
-		}
-	}*/
-
-	//Debug
-	/*cmp_part(id,0,0);
-
-	cmp_part(id,1,1);
-	cmp_part(id,0,1);
-
-	cmp_part(id,2,2);
-	cmp_part(id,0,2);
-	cmp_part(id,1,2);*/
-
-
-	//if (id == 0) debug = PSIZE*3 - debug;
-	//if (id == 0) count_sky_points(3);
 
 
 	return 0;
