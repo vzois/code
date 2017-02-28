@@ -1,3 +1,7 @@
+
+#ifndef TOOLS_H
+#define TOOLS_H
+
 #include<meetpoint.h>
 #include"../common/config.h"
 
@@ -86,3 +90,5 @@ void popc(uint32_t v, uint32_t *r){
     c = ((c >> 16) + c) & 0x0000FFFF;
     r[0]+=c;
 }
+
+#endif

@@ -208,7 +208,7 @@ def dskyline():
                 gsky_i.append(j+total)
                 gsky.append(q)
         
-        if (part_index < 1 or (len(gsky_i) > 0)) and True:
+        if (part_index < 1 and (len(gsky_i) > 0)) and True:
             print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
             bit_vectors(gsky_i)
