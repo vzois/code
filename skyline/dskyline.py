@@ -12,6 +12,7 @@ from skydata import scale
 N=0
 D=0
 P=0
+L=0
 PSIZE=0
 parts_p=list()
 parts_i=list()
@@ -19,6 +20,10 @@ parts_r=list()
 
 def pfmtb(v):
     return "{0:#0{1}x}".format(v,10)
+    #return str(format(v, fmt))
+    
+def pfmtbin(v):
+    return format(v, '#06b')
     #return str(format(v, fmt))
 
 def DT(p,q):
@@ -31,22 +36,7 @@ def DT(p,q):
     
     return ~qb & pb
 
-def split(points,sumf,n):
-    global N,D,P,parts_p,parts_r,parts_i
-    if N/P == n:
-        parts_p.append(points)
-        parts_r.append(sumf)
-    else:
-        kval = rselect(sumf,n/2)
-        print "kval:",kval
-        lp = [points[i] for i in range(len(points)) if sumf[i] <= kval ]
-        ls = [sumf[i] for i in range(len(points)) if sumf[i] <= kval ]
-        rp = [points[i] for i in range(len(points)) if sumf[i] > kval ]
-        rs = [sumf[i] for i in range(len(points)) if sumf[i] > kval ]
-        split(lp,ls,n/2)
-        split(rp,rs,n/2)
-
-def split2(indices,sumf,n):
+def split(indices,sumf,n):
     global N,D,P,parts_p,parts_r,parts_i
     if N/P == n:
         parts_i.append(indices)
@@ -58,16 +48,67 @@ def split2(indices,sumf,n):
         ls = [sumf[i] for i in range(len(indices)) if sumf[i] <= kval ]
         ri = [indices[i] for i in range(len(indices)) if sumf[i] > kval ]
         rs = [sumf[i] for i in range(len(indices)) if sumf[i] > kval ]
-        split2(li,ls,n/2)
-        split2(ri,rs,n/2)     
+        split(li,ls,n/2)
+        split(ri,rs,n/2)     
+
+def popC(v):
+    c = v - ((v >> 1) & 0x55555555)
+    c = ((c >> 2) & 0x33333333) + (c & 0x33333333)
+    c = ((c >> 4) + c) & 0x0F0F0F0F
+    c = ((c >> 8) + c) & 0x00FF00FF
+    c = ((c >> 16) + c) & 0x0000FFFF
+    return c
+
+def createBitVectors(points):
+    global N,D,L
+    
+    pivots=list()
+    step = N/(2**L) 
+    for i in range(D):
+        dim_vec = [ p[i] for p in points ]
+        pp = list()
+        
+        for kth in range(step,N,step):
+            kval = rselect(dim_vec,kth)
+            pp.append(kval)
+        pivots.append(pp)
+    
+    #print pivots
+    
+    p_vecs = list()
+    for p in points:
+        bit=0
+        vecs = [0 for m in range(L)]
+        for i in range(D):
+            pvt = pivots[i]
+            offset = len(pvt)/2
+            
+            k=0
+            for j in range(0,L):
+                set = p[i] >= pvt[offset]
+                if set:
+                    vecs[k] = vecs[k] ^ (0x1 << bit);
+                offset = (offset << 1) if set else (offset >> 1)
+                offset = min(offset,len(pvt)-1)
+                #print p[i],">=", pvt[offset],set,vecs[k]
+                k+=1
+            bit+=1
+        #print "<",p,">",[pfmtbin(v) for v in vecs]
+        #raw_input("Press Enter to continue...")
+        p_vecs.append(vecs)      
+    
+    return p_vecs
+    
+    
 
 def createPartitions(points,sumf):
     global N,D,P,parts_p,parts_r,parts_i
     x=0
     kth = N/2
     
+    createBitVectors(points)
     indices = [i for i in range(len(sumf))]
-    split2(indices,sumf,N)
+    split(indices,sumf,N)#Recursive split
     
     stddev = 0
     for pi in parts_i:
@@ -78,7 +119,7 @@ def createPartitions(points,sumf):
     
     part_i_t = list()
     part_r_t = list()
-    for i in range(len(parts_i)):
+    for i in range(len(parts_i)):#build partitions
         z = sorted(zip(parts_r[i],parts_i[i]))
         rnk,ind = zip(*z)
         #print rnk
@@ -95,7 +136,6 @@ def createPartitions(points,sumf):
     #print "parts_r: (1)",parts_r[1]
     for pi in parts_i:
         parts_p.append([points[i] for i in pi ])
-    
     #print "parts_p: (0)",parts_p[0], sum(parts_p[0][0])
 
 def spiral(parts,dpus):
@@ -174,7 +214,6 @@ def bit_vectors(gsky_i):
     #[ pfmtb(v) for v in bv ]
     
     print "}>>"
-    
 
 def dskyline():
     global parts_p,parts_r, parts_i
@@ -218,6 +257,7 @@ def dskyline():
         gsky_i = list()
     print "dkyline len:",len(gsky), hex(len(gsky))
  
+
 print "Generating data...."    
 fp = open("common/config.h","r")
 for line in fp.readlines():
@@ -235,6 +275,8 @@ for line in fp.readlines():
     elif line.strip().startswith("#define PSIZE "):
         PSIZE = int(line.strip().split(" ")[2])
         P = N/PSIZE
+    elif line.strip().startswith("#define L"):
+        L = int(line.strip().split(" ")[2])
 
 fp.close()    
         
@@ -246,7 +288,7 @@ rank = [min(min(points[i]),sum(points[i])) for i in range(N)]
 #rank = [sum(points[i]) for i in range(N)]
 #rank = [min(points[i]) for i in range(N)]
 
-if False:
+if True:
     dskyline_t = time.time()
     createPartitions(points,rank)
     dskyline()
