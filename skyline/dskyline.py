@@ -17,6 +17,10 @@ PSIZE=0
 parts_p=list()
 parts_i=list()
 parts_r=list()
+parts_b=list()
+
+dt_num_red = 0
+dt_num = 0
 
 def pfmtb(v):
     return "{0:#0{1}x}".format(v,10)
@@ -99,14 +103,12 @@ def createBitVectors(points):
     
     return p_vecs
     
-    
-
 def createPartitions(points,sumf):
-    global N,D,P,parts_p,parts_r,parts_i
+    global N,D,P,parts_p,parts_r,parts_i,parts_b
     x=0
     kth = N/2
     
-    createBitVectors(points)
+    p_vecs=createBitVectors(points)
     indices = [i for i in range(len(sumf))]
     split(indices,sumf,N)#Recursive split
     
@@ -136,6 +138,7 @@ def createPartitions(points,sumf):
     #print "parts_r: (1)",parts_r[1]
     for pi in parts_i:
         parts_p.append([points[i] for i in pi ])
+        parts_b.append([p_vecs[i] for i in pi ])
     #print "parts_p: (0)",parts_p[0], sum(parts_p[0][0])
 
 def spiral(parts,dpus):
@@ -181,21 +184,40 @@ def sfs(points, rank):
     
     return sky
 
-def sfs_p(points, rank):
+def sfs_p(points, rank, bvecs):
+    global dt_num_red,dt_num
     keys = range(len(rank))
     #keys = [k for (r,k) in sorted(zip(rank,keys))]
     sky = [keys[0]]
     for i in keys:
         q = points[i]
+        Mi = bvecs[i][0]
+        Qi = bvecs[i][1]
         dt = False
         #print "sky:",sky
         for j in sky:
             #print j
             p = points[j]
+            Mj = bvecs[j][0]
+            Qj = bvecs[j][1]
+            dt_num+=1# count regular DTs
+            
             #print i,"=",p,",",q, "<",DT(p,q)
+            #Bitvector DT comparison#
+            if ((Mj | Mi) > Mi):
+                continue
+            elif popC(Mi) < popC(Mj):
+                continue
+            elif (((Mj | ~Mi) & Qj) | Qi) > Qi:
+                continue
+            elif (Mi == Mj) and ((Qj | Qi) > Qi):
+                continue
+            
             if DT(p,q):
                 dt = True
                 break
+            dt_num_red+=1# count reduced DTs
+            
         if not dt and (i not in sky):
             sky.append(i)
     
@@ -216,8 +238,9 @@ def bit_vectors(gsky_i):
     print "}>>"
 
 def dskyline():
-    global parts_p,parts_r, parts_i
+    global parts_p,parts_r, parts_i, parts_b
     global PSIZE
+    global dt_num_red,dt_num
     
     gsky = []
     part = 0
@@ -225,29 +248,51 @@ def dskyline():
     total = 0;
     gsky_i = list()
     g_ps = 0xFFFFFFFF
+    gsky_b = list()
     for i in range(len(parts_p)):
         pp=parts_p[i]
         rp=parts_r[i]
         ip=parts_i[i]
-        if g_ps <= rp[0] :
+        bp=parts_b[i]
+        
+        if g_ps <= rp[0] : # stop point reached
             break
-        tsky = sfs_p(pp,rp)
-        for j in tsky:
+        tsky = sfs_p(pp,rp,bp) # self prune partition
+        for j in tsky: # prune surviving points
             q = pp[j]
+            Mi = bp[j][0]
+            Qi = bp[j][1]
             dt = 0
             
-            for p in gsky:
+            for k in range(len(gsky)):#check points in the global skyline
+                p = gsky[k]
+                Mj = gsky_b[k][0]
+                Qj = gsky_b[k][1]
+                
+                dt_num+=1# count regular DTs
+                #Fast DT with bitvectors
+                if ((Mj | Mi) > Mi):
+                    continue
+                elif popC(Mi) < popC(Mj):
+                    continue
+                elif (((Mj | ~Mi) & Qj) | Qi) > Qi:
+                    continue
+                elif (Mi == Mj) and ((Qj | Qi) > Qi):
+                    continue
+                dt_num_red+=1# count reduced DTs
+                
                 if DT(p,q):
                     dt = 1
                     break
             
-            if dt == 0:
-                g_ps=min([max(pp[j]),g_ps])
+            if dt == 0:#update skyline information when point is not dominated
+                g_ps=min([max(pp[j]),g_ps])#update stop point
+                gsky_i.append(j+total)#index of local skyline
                 
-                gsky_i.append(j+total)
-                gsky.append(q)
+                gsky.append(q)#append point in the global skyline
+                gsky_b.append(bp[j])# append bit vector to skyline
         
-        if (part_index < 1 and (len(gsky_i) > 0)) and True:
+        if (part_index < 1 and (len(gsky_i) > 0)) and True:#debugging data
             print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
             bit_vectors(gsky_i)
@@ -256,6 +301,8 @@ def dskyline():
         total+=PSIZE
         gsky_i = list()
     print "dkyline len:",len(gsky), hex(len(gsky))
+    print "dskyline full DTs:",dt_num
+    print "dskyline reduced DTs:",dt_num_red
  
 
 print "Generating data...."    

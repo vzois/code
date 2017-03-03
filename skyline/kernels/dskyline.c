@@ -51,7 +51,9 @@ int main(){
 	barrier_wait(id);
 	int16_t i = 0 , j = 0;
 
-	cmp_part_4d(id,0,0);
+	if(D==4) cmp_part_4d(id,0,0);
+	else if(D==8) cmp_part_8d(id,0,0);
+	//else if(D==16) cmp_part_16d(id,0,0);
 
 
 	return 0;

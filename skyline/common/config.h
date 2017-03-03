@@ -8,7 +8,7 @@
 #define DATA_N 32768
 #define DPUS 1
 #define N (DATA_N / DPUS)
-#define D 4
+#define D 16
 #define PSIZE 256 //Partition size
 #define PSIZE_BYTES ((PSIZE*D) << 2)
 #define PSIZE_SHF 8
