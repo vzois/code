@@ -78,40 +78,20 @@ def storeDSkyData(parts_p,parts_r,parts_i,parts_b):
         for r in pr:
             f.write(struct.pack('i', r))
         count+=1
+
+    count = 0
     
-    #for pp in parts_p:
-    #    for p in pp:    #        pm = min(p)    
-    #        if count < printc and Debug:
-    #            print [hex(v) for v in p],hex(pm)
-    #        count+=1
-    #        f.write(struct.pack('i', pm))
-    #    if Debug:
-    #        print "--------------->"
-    #        count = 0
-    
-    D = len(parts_p[0][0])
-    #print "D:",D
-    print "Storing bit vectors!!!"
-    for bp in parts_b:
-        for bvec in bp:
-            x=0
-            shf=0
-            for b in bvec:
-                x = x | (b <<shf)
-                shf+=D
-    #            #print bin(b),bin(x)
-            #break
-            f.write(struct.pack('i', x))
-        #break
-        
-    f.close()
-    
+    D=len(parts_p[0][0])
+    print "Storing bvectors in partitions!!!"
     for i in range((len(parts_p))):
         pp=parts_p[i]
         rp=parts_r[i]
         ip=parts_i[i]
         bp=parts_b[i]
-        break
+        #break
+        if count < 0:
+            print "<",i,">-----------------"
+            
         for j in range(len(pp)):
             x=0
             shf=0
@@ -119,8 +99,15 @@ def storeDSkyData(parts_p,parts_r,parts_i,parts_b):
                 x = x | (b <<shf)
                 shf+=D
             
-            print "p:",[ hex(v) for v in pp[j] ],"r:",hex(rp[j]),"b:",hex(x)
-        break
+            if count < 0:
+                print "p:",[ hex(v) for v in pp[j] ],"r:",hex(rp[j]),"b:",hex(x)
+            f.write(struct.pack('i', x))
+        
+        
+          
+        count+=1
+        #raw_input("Press any key to continue...")
+        #break
         
         
         

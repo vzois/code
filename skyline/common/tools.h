@@ -82,7 +82,7 @@ uint32_t max_vec16(uint32_t *vec){
 	return MAX(mx0,mx4);
 }
 
-void popc(uint32_t v, uint32_t *r){
+void popC(uint32_t v, uint32_t *r){
     uint32_t c = v - ((v >> 1) & 0x55555555);
     c = ((c >> 2) & 0x33333333) + (c & 0x33333333);
     c = ((c >> 4) + c) & 0x0F0F0F0F;

@@ -14,7 +14,7 @@ void count_sky_points(uint32_t p){//Debug Only
 		mram_ll_read32(pflag_offset,pflag);
 		for(j = 0; j < 8;j++){
 
-			popc(pflag[j],r);
+			popC(pflag[j],r);
 		}
 		rp[i] = r[0] - rp[i];
 
@@ -58,6 +58,8 @@ int main(){
 	}
 	else if(D==8){
 		cmp_part_8d(id,0,0);
+		cmp_part_8d(id,0,1);
+		cmp_part_8d(id,1,1);
 	}
 	//else if(D==16) cmp_part_16d(id,0,0);
 

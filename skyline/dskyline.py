@@ -63,6 +63,9 @@ def popC(v):
     c = ((c >> 16) + c) & 0x0000FFFF
     return c
 
+def popc_4d(v):
+    x=0
+
 def createBitVectors(points):
     global N,D,L
     
@@ -204,7 +207,7 @@ def sfs_p(points, rank, bvecs):
             
             #print i,"=",p,",",q, "<",DT(p,q)
             #Bitvector DT comparison#
-            if ((Mj | Mi) > Mi):
+            if ((Mi | Mj) > Mj):
                 continue
             elif popC(Mi) < popC(Mj):
                 continue
@@ -292,7 +295,7 @@ def dskyline():
                 gsky.append(q)#append point in the global skyline
                 gsky_b.append(bp[j])# append bit vector to skyline
         
-        if (part_index < 32 and (len(gsky_i) > 0)) and True:#debugging data
+        if (part_index < 2 and (len(gsky_i) > 0)) and True:#debugging data
             print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
             bit_vectors(gsky_i)
