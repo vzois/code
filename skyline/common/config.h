@@ -8,7 +8,7 @@
 #define DATA_N 32768
 #define DPUS 1
 #define N (DATA_N / DPUS)
-#define D 16
+#define D 4
 #define PSIZE 256 //Partition size
 #define PSIZE_BYTES ((PSIZE*D) << 2)
 #define PSIZE_SHF 8
@@ -56,11 +56,15 @@
 ////////////////////////////////////////////
 //dskyline Runtime Configuration
 ////////////////////////////////////////////
-#define DSKY_POINTS_ADDR 0x4000// Starting offset of point partitions
+#define DSKY_POINTS_ADDR 0x3000// Starting offset of point partitions
 #define DSKY_RANK_ADDR (DSKY_POINTS_ADDR + ((N * D)<<2))//Precomputed rank for each point within each partition
-#define DSKY_PART_ALIVE_COUNT ( DSKY_RANK_ADDR + (N << 2) )//?
-#define FLAGS_ADDR 0x331F000//Flags to determine which points are alive or not
-#define DSKY_REMOTE_PART_ADDR 0x332F000//Remote partition during communication stage
+#define DSKY_BVECS_ADDR (DSKY_RANK_ADDR +  (N << 2))
+#define DSKY_FLAGS_ADDR 0x370F000//Flags to determine which points are alive or not
+
+#define DSKY_REMOTE_PSTOP_ADDR 0x373F000//global stop point
+#define DSKY_REMOTE_FLAGS_ADDR (DSKY_REMOTE_PSTOP_ADDR + 4)//flags for current partition window
+#define DSKY_REMOTE_BVECS_ADDR (DSKY_REMOTE_FLAGS_ADDR + ((PSIZE/32) << 2))//bit vectors of remote partition
+#define DSKY_REMOTE_POINTS_ADDR (DSKY_REMOTE_BVECS_ADDR + (PSIZE << 2))//Remote partition during communication stage
 
 #define POINTS_PER_T (PSIZE / TASKLETS)
 #define POINTS_PER_T_VALUES ( POINTS_PER_T * D )

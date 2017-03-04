@@ -3,7 +3,7 @@
 
 void count_sky_points(uint32_t p){//Debug Only
 	uint32_t i = 0, j=0;
-	uint32_t pflag_offset = FLAGS_ADDR;
+	uint32_t pflag_offset = DSKY_FLAGS_ADDR;
 
 	//uint32_t *pflag = pflags[0];
 	uint32_t *r = dma_alloc(4);
@@ -51,8 +51,14 @@ int main(){
 	barrier_wait(id);
 	int16_t i = 0 , j = 0;
 
-	if(D==4) cmp_part_4d(id,0,0);
-	else if(D==8) cmp_part_8d(id,0,0);
+	if(D==4){
+		cmp_part_4d(id,0,0);
+		cmp_part_4d(id,0,1);
+		cmp_part_4d(id,1,1);
+	}
+	else if(D==8){
+		cmp_part_8d(id,0,0);
+	}
 	//else if(D==16) cmp_part_16d(id,0,0);
 
 

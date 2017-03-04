@@ -292,7 +292,7 @@ def dskyline():
                 gsky.append(q)#append point in the global skyline
                 gsky_b.append(bp[j])# append bit vector to skyline
         
-        if (part_index < 1 and (len(gsky_i) > 0)) and True:#debugging data
+        if (part_index < 32 and (len(gsky_i) > 0)) and True:#debugging data
             print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
             bit_vectors(gsky_i)
@@ -368,6 +368,6 @@ cmp_multi_dpu = spiral((N*dpus)/PSIZE,2048)
 print "single dpu comparison count:",cmp_single_dpu
 print "multi dpu comparison count:",cmp_multi_dpu
 
-storeDSkyData(parts_p,parts_r,parts_i)
+storeDSkyData(parts_p,parts_r,parts_i,parts_b)
 
 
