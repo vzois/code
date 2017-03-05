@@ -61,6 +61,11 @@ int main(){
 		cmp_part_8d(id,0,1);
 		cmp_part_8d(id,1,1);
 	}
+	else if(D==16){
+		cmp_part_16d(id,0,0);
+		cmp_part_16d(id,0,1);
+		cmp_part_16d(id,1,1);
+	}
 	//else if(D==16) cmp_part_16d(id,0,0);
 
 

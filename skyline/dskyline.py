@@ -105,7 +105,7 @@ def createBitVectors(points):
         p_vecs.append(vecs)      
     
     return p_vecs
-    
+   
 def createPartitions(points,sumf):
     global N,D,P,parts_p,parts_r,parts_i,parts_b
     x=0
@@ -306,7 +306,6 @@ def dskyline():
     print "dkyline len:",len(gsky), hex(len(gsky))
     print "dskyline full DTs:",dt_num
     print "dskyline reduced DTs:",dt_num_red
- 
 
 print "Generating data...."    
 fp = open("common/config.h","r")
@@ -338,7 +337,7 @@ rank = [min(min(points[i]),sum(points[i])) for i in range(N)]
 #rank = [sum(points[i]) for i in range(N)]
 #rank = [min(points[i]) for i in range(N)]
 
-if True:
+if False:
     dskyline_t = time.time()
     createPartitions(points,rank)
     dskyline()

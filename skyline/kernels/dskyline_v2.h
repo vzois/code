@@ -72,6 +72,13 @@ void init_v2(uint8_t id){
 	}
 }
 
+void load_part_t(uint16_t cpart_i, uint32_t *buffer, uint8_t id){
+	uint32_t offset = id << 10;
+	uint32_t ppos_i = cpart_i << PSIZE_SHF;//Position of partition i
+	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i ) * D)<<2 );//Partition i starting addr
+	mram_ll_read1024_new(i_addr + offset, &buffer[offset >> 2]);
+}
+
 void load_part_4d(uint16_t cpart_i, uint32_t *buffer){
 	uint32_t ppos_i = cpart_i << PSIZE_SHF;//Position of partition i
 	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i ) * D)<<2 );//Partition i starting addr
@@ -97,8 +104,8 @@ void load_part_8d(uint16_t cpart_i, uint32_t *buffer){
 void load_part_8d_t(uint16_t cpart_i, uint32_t *buffer, uint8_t id){
 	uint32_t offset = id * 1024;
 	uint32_t ppos_i = cpart_i << PSIZE_SHF;//Position of partition i
-	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i + offset ) * D)<<2 );//Partition i starting addr
-	mram_ll_read1024_new(i_addr, &buffer[offset >> 2]);
+	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i ) * D)<<2 );//Partition i starting addr
+	mram_ll_read1024_new(i_addr + offset, &buffer[offset >> 2]);
 }
 
 void load_part_16d(uint16_t cpart_i, uint32_t *buffer){
@@ -125,9 +132,14 @@ void load_part_16d(uint16_t cpart_i, uint32_t *buffer){
 
 void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t qflag_addr;
+
+	if(id < 4){
+		load_part_t(cpart_i,window,id);
+		load_part_t(cpart_j,Cj,id);
+	}
 	if(id == 0){
-		load_part_4d(cpart_i,window);
-		load_part_4d(cpart_j,Cj);
+		//load_part_4d(cpart_i,window);
+		//load_part_4d(cpart_j,Cj);
 
 		uint32_t pflag_addr = DSKY_FLAGS_ADDR + (cpart_i << 5);
 		qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
@@ -187,13 +199,13 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t qflag_offset;
 
-	//if(id < 8){
-	//	load_part_8d_t(cpart_i,window,id);
-	//	load_part_8d_t(cpart_j,Cj,id);
-	//}
+	if(id < 8){
+		load_part_t(cpart_i,window,id);
+		load_part_t(cpart_j,Cj,id);
+	}
 	if(id == 0){
-		load_part_8d(cpart_i,window);
-		load_part_8d(cpart_j,Cj);
+		//load_part_8d(cpart_i,window);
+		//load_part_8d(cpart_j,Cj);
 
 		uint32_t pflag_offset = DSKY_FLAGS_ADDR + (cpart_i << 5);
 		qflag_offset = DSKY_FLAGS_ADDR + (cpart_j << 5);
@@ -218,14 +230,14 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		uint32_t *q = &Cj[work_offset + j];
 		uint8_t dt = 0;
 		uint16_t vi_offset = (work_offset + j) >> 3;//divide index by 8
-		uint8_t Mi = (qbvec[vi_offset] & 0xF);
-		uint8_t Qi = (qbvec[vi_offset] & 0xF0) >> 4;
+		uint8_t Mi = (qbvec[vi_offset] & 0xFF);
+		uint8_t Qi = (qbvec[vi_offset] & 0xFF00) >> 8;
 
 		for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){
 			uint32_t *p = &window[i];
 			uint16_t vj_offset = i >> 3;//divide index by 8
-			uint8_t Mj = (pbvec[vj_offset] & 0xF);
-			uint8_t Qj = (pbvec[vj_offset] & 0xF0) >> 4;
+			uint8_t Mj = (pbvec[vj_offset] & 0xFF);
+			uint8_t Qj = (pbvec[vj_offset] & 0xFF00) >> 8;
 
 			if ((Mj | Mi) > Mi) continue;
 			else if(pc[Mi] < pc[Mj]) continue;
@@ -253,9 +265,13 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 
 void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t qflag_offset;
+
+	load_part_t(cpart_i,window,id);
+	load_part_t(cpart_j,Cj,id);
+
 	if(id == 0){
-		load_part_16d(cpart_i,window);
-		load_part_16d(cpart_j,Cj);
+		//load_part_16d(cpart_i,window);
+		//load_part_16d(cpart_j,Cj);
 
 		uint32_t pflag_offset = DSKY_FLAGS_ADDR + (cpart_i << 5);
 		qflag_offset = DSKY_FLAGS_ADDR + (cpart_j << 5);
@@ -279,15 +295,15 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	for(j = 0 ; j < POINTS_PER_T_VALUES; j+=D){
 		uint32_t *q = &Cj[work_offset + j];
 		uint8_t dt = 0;
-		uint16_t vi_offset = (work_offset + j) >> 3;//divide index by 8
-		uint8_t Mi = (qbvec[vi_offset] & 0xF);
-		uint8_t Qi = (qbvec[vi_offset] & 0xF0) >> 4;
+		uint16_t vi_offset = (work_offset + j) >> 4;//divide index by 16
+		uint8_t Mi = (qbvec[vi_offset] & 0xFFFF);//16 bit vector
+		uint8_t Qi = (qbvec[vi_offset] & 0xFFFF0000) >> 16;
 
 		for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){
 			uint32_t *p = &window[i];
-			uint16_t vj_offset = i >> 3;//divide index by 8
-			uint8_t Mj = (pbvec[vj_offset] & 0xF);
-			uint8_t Qj = (pbvec[vj_offset] & 0xF0) >> 4;
+			uint16_t vj_offset = i >> 4;//divide index by 16
+			uint8_t Mj = (pbvec[vj_offset] & 0xFFFF);//16 bit vector
+			uint8_t Qj = (pbvec[vj_offset] & 0xFFFF0000) >> 16;
 
 			if ((Mj | Mi) > Mi) continue;
 			else if(pc[Mi] < pc[Mj]) continue;
@@ -310,7 +326,6 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	if(id < 8) qflag[id] = mflags[id << 1];
 	barrier_wait(id);
 	if(id==0) mram_ll_write32(qflag,qflag_offset);
-	//barrier_wait(id);
 }
 
 #endif

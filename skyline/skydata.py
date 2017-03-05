@@ -7,7 +7,7 @@ import time
 #D = int(sys.argv[2])
 #distr = sys.argv[3]
 
-scale = 1024 * 1024
+scale = 1024 * 1024 * 1024
 
 def genData(N,D,distr):
     print time.time()

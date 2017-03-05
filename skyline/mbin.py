@@ -66,7 +66,7 @@ def storeDSkyData(parts_p,parts_r,parts_i,parts_b):
                 print""
         for p in pp:# for each point in the partition
             for d in p:# write binary file of points
-                f.write(struct.pack('i', d))
+                f.write(struct.pack('I', d))
         count+=1
     
     count = 0
@@ -76,7 +76,7 @@ def storeDSkyData(parts_p,parts_r,parts_i,parts_b):
         if count < printc and False:
             print hex(pr[0])
         for r in pr:
-            f.write(struct.pack('i', r))
+            f.write(struct.pack('I', r))
         count+=1
 
     count = 0
@@ -101,7 +101,7 @@ def storeDSkyData(parts_p,parts_r,parts_i,parts_b):
             
             if count < 0:
                 print "p:",[ hex(v) for v in pp[j] ],"r:",hex(rp[j]),"b:",hex(x)
-            f.write(struct.pack('i', x))
+            f.write(struct.pack('I', x))
         
         
           
