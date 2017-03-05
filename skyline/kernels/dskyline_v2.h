@@ -9,18 +9,25 @@
 
 #ifdef V_2
 
-uint32_t *window;
-uint32_t *Cj;
+#define CHECK_ONLY_ACTIVE_POINTS
 
-uint32_t *pbvec;
-uint32_t *qbvec;
+uint32_t *window;//At most 16KB
+uint32_t *Cj;//At most 16KB
 
-uint32_t *pflag;
-uint32_t *qflag;
-uint32_t mflags[TASKLETS];
+uint32_t *pbvec;// At most 1KB // 256 points with at most 32 bit bit vectors each
+uint32_t *qbvec;// At most 1KB // 256 points with at most 32 bit bit vectors each
+
+uint32_t *pflag;// At most 8 , 32-bit wide flags = 32 bytes
+uint32_t *qflag;// At most 8 , 32-bit wide flags = 32 bytes
+uint32_t mflags[TASKLETS];// At most 16 tasklets, 64 bytes
+uint8_t pflag_a[256];//
+uint8_t qflag_a[256];
 
 uint32_t debug;
-uint8_t pc[256];
+uint8_t pc[256];//At most 256 bytes, used to precount the bit vectors
+
+uint32_t g_ps;//global pstop
+uint32_t ps[TASKLETS][D];//At most 1KB, 16 * 16 * 4 => 1024 bytes
 
 void popc_8b(uint8_t v, uint8_t *c){
 	//c[0] = v;
@@ -55,6 +62,8 @@ void init_v2(uint8_t id){
 		Cj = dma_alloc(PSIZE_BYTES);
 		pbvec = dma_alloc(PSIZE << 2);
 		qbvec = dma_alloc(PSIZE << 2);
+
+		g_ps = 0xFFFFFFFF;
 	}
 	barrier_wait(id);
 
@@ -67,9 +76,23 @@ void init_v2(uint8_t id){
 	}
 
 	for(i=id;i<256;i+=TASKLETS){
-		//pc[i]=i;
-		popc_8b(i,&pc[i]);
+		popc_8b(i,&pc[i]);//bit count map
 	}
+}
+
+void part_dt(uint16_t cpart_i, uint16_t cpart_j){
+
+}
+
+void calc_active_p(uint8_t id){
+	uint32_t i = 0;
+	for(i=id;i<256;i+=16){
+		uint8_t pos = (i & 0xE0) >> 5;
+		uint8_t bit = (i & 0x1F);
+		pflag_a[i]=(pflag[pos] >> bit) & 0x1;//mark active points
+		//qflag_a[i]=(qflag[pos] >> bit) & 0x1;
+	}
+	barrier_wait(id);
 }
 
 void load_part_t(uint16_t cpart_i, uint32_t *buffer, uint8_t id){
@@ -158,17 +181,29 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t work_offset = POINTS_PER_T_VALUES * id;//
 	uint32_t i = 0, j = 0, k = 0;
 	uint8_t qbit = 0;
-	uint8_t count = 0;
+
+
+#ifdef CHECK_ONLY_ACTIVE_POINTS
+	uint8_t qi = id * TASKLETS;
+	calc_active_p(id);
+#endif
 
 	//Prune points from Cj partition using Ci <Ci,Cj>
 	for(j = 0 ; j < POINTS_PER_T_VALUES; j+=D){//For each point in Cj partition
+#ifdef CHECK_ONLY_ACTIVE_POINTS
+		if( ((tflag >> qbit) & 0x1) == 0x0 ){ qbit++; continue; }//prune point only if it is alive from previous iteration//
+#endif
 		uint32_t *q = &Cj[work_offset + j];
-		uint8_t dt = 0;
 		uint16_t vi_offset = (work_offset + j) >> 2;
 		uint8_t Mi = (qbvec[vi_offset] & 0xF);
 		uint8_t Qi = (qbvec[vi_offset] & 0xF0) >> 4;
+		uint8_t dt = 0;
 
 		for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){//For each point in Ci partition
+#ifdef CHECK_ONLY_ACTIVE_POINTS
+			if (pflag_a[i>>2] == 0){ continue; } //Check if point is active// divide index by 4
+#endif
+
 			uint32_t *p = &window[i];
 			uint16_t vj_offset = i >> 2;
 			uint8_t Mj = (pbvec[vj_offset] & 0xF);
@@ -182,11 +217,14 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 
 			if(DT_(p,q) == 1){
 				tflag &= ~(0x1 << qbit);//Set flag for dominance
+				dt = 1;
 				break;
 			}
 		}
 		qbit++;
 	}
+	barrier_wait(id);
+
 	mflags[id] = tflag;
 	barrier_wait(id);
 	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16);
@@ -225,15 +263,24 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t i = 0, j = 0;
 	uint8_t qbit = 0;
 
-	uint8_t count = 0;
+#ifdef CHECK_ONLY_ACTIVE_POINTS
+	calc_active_p(id);
+#endif
+
 	for(j = 0 ; j < POINTS_PER_T_VALUES; j+=D){
+#ifdef CHECK_ONLY_ACTIVE_POINTS
+		if( ((tflag >> qbit) & 0x1) == 0x0 ){ qbit++; continue; }//prune point only if it is alive from previous iteration
+#endif
 		uint32_t *q = &Cj[work_offset + j];
-		uint8_t dt = 0;
 		uint16_t vi_offset = (work_offset + j) >> 3;//divide index by 8
 		uint8_t Mi = (qbvec[vi_offset] & 0xFF);
 		uint8_t Qi = (qbvec[vi_offset] & 0xFF00) >> 8;
+		uint8_t dt = 0;
 
 		for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){
+#ifdef CHECK_ONLY_ACTIVE_POINTS
+			if (pflag_a[i>>3] == 0){ continue; } //Check if point is active// divide index by 8
+#endif
 			uint32_t *p = &window[i];
 			uint16_t vj_offset = i >> 3;//divide index by 8
 			uint8_t Mj = (pbvec[vj_offset] & 0xFF);
@@ -247,6 +294,7 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 
 			if(DT_(p,q) == 1){
 				tflag &= ~(0x1 << qbit);//Set flag for dominance
+				dt=1;
 				break;
 			}
 		}
@@ -291,28 +339,43 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t i = 0, j = 0;
 	uint8_t qbit = 0;
 
-	uint8_t count = 0;
+#ifdef CHECK_ONLY_ACTIVE_POINTS
+	calc_active_p(id);
+#endif
+
 	for(j = 0 ; j < POINTS_PER_T_VALUES; j+=D){
+#ifdef CHECK_ONLY_ACTIVE_POINTS
+		if( ((tflag >> qbit) & 0x1) == 0x0 ){ qbit++; continue; }//prune point only if it is alive from previous iteration
+#endif
 		uint32_t *q = &Cj[work_offset + j];
-		uint8_t dt = 0;
 		uint16_t vi_offset = (work_offset + j) >> 4;//divide index by 16
 		uint8_t Mi = (qbvec[vi_offset] & 0xFFFF);//16 bit vector
 		uint8_t Qi = (qbvec[vi_offset] & 0xFFFF0000) >> 16;
+		uint8_t dt = 0;
 
 		for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){
+
+#ifdef CHECK_ONLY_ACTIVE_POINTS
+			if (pflag_a[i>>4] == 0){ continue; } //Check if point is active// divide index by 16
+#endif
+
 			uint32_t *p = &window[i];
 			uint16_t vj_offset = i >> 4;//divide index by 16
 			uint8_t Mj = (pbvec[vj_offset] & 0xFFFF);//16 bit vector
 			uint8_t Qj = (pbvec[vj_offset] & 0xFFFF0000) >> 16;
 
 			if ((Mj | Mi) > Mi) continue;
-			else if(pc[Mi] < pc[Mj]) continue;
-			else if((pc[Mi] == pc[Mj]) & (Mj != Mi)) continue;
+			uint8_t ci = pc[Mi & 0xFF] + pc[Mi>>8];
+			uint8_t cj = pc[Mj & 0xFF] + pc[Mj>>8];
+
+			if(ci < cj) continue;
+			else if((ci == cj) & (Mj != Mi)) continue;
 			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
 			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
 
 			if(DT_(p,q) == 1){
 				tflag &= ~(0x1 << qbit);//Set flag for dominance
+				dt=1;
 				break;
 			}
 		}

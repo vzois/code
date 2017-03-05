@@ -351,11 +351,15 @@ if False:
     print "sfs len:",len(sky_sfs)
 else:
     print "Creating Partitions..."
-    dskyline_t = time.time()
+    createpart_t = time.time()
     createPartitions(points,rank)
+    createpart_t = time.time() - createpart_t
+    
+    dskyline_t = time.time()
     dskyline()
     dskyline_t = time.time() - dskyline_t
-    print "create partitions elapsed time:",dskyline_t
+    print "dskyline elapsed time:",dskyline_t
+    print "create partition elapsed time:",createpart_t
 
 #Execution Information
 dpus = 2048

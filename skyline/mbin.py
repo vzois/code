@@ -48,7 +48,7 @@ def storeDSkyData(parts_p,parts_r,parts_i,parts_b):
     f = open("runtime_data/dsky.bin","wb")
     
     for i in range(3072):
-        f.write(struct.pack('i', 0x0))
+        f.write(struct.pack('I', 0x0))
     
     count = 0
     printc = 10
