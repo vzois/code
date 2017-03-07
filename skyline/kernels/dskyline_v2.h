@@ -10,6 +10,8 @@
 #ifdef V_2
 
 #define CHECK_ONLY_ACTIVE_POINTS
+#define COMPUTE_GLOBAL_PSTOP
+#define USE_BIT_VECTORS
 
 uint32_t *window;//At most 16KB
 uint32_t *Cj;//At most 16KB
@@ -27,7 +29,7 @@ uint32_t debug;
 uint8_t pc[256];//At most 256 bytes, used to precount the bit vectors
 
 uint32_t g_ps;//global pstop
-uint32_t ps[TASKLETS][D];//At most 1KB, 16 * 16 * 4 => 1024 bytes
+uint32_t ps[TASKLETS];//At most 1KB, 16 * 16 * 4 => 1024 bytes
 
 void popc_8b(uint8_t v, uint8_t *c){
 	//c[0] = v;
@@ -65,7 +67,9 @@ void init_v2(uint8_t id){
 
 		g_ps = 0xFFFFFFFF;
 	}
+	ps[id] = 0xFFFFFFFF;
 	barrier_wait(id);
+
 
 	if (id < 8) pflag[id] = 0xFFFFFFFF;
 	barrier_wait(id);
@@ -80,10 +84,6 @@ void init_v2(uint8_t id){
 	}
 }
 
-void part_dt(uint16_t cpart_i, uint16_t cpart_j){
-
-}
-
 void calc_active_p(uint8_t id){
 	uint32_t i = 0;
 	for(i=id;i<256;i+=16){
@@ -93,6 +93,34 @@ void calc_active_p(uint8_t id){
 		//qflag_a[i]=(qflag[pos] >> bit) & 0x1;
 	}
 	barrier_wait(id);
+}
+
+void acc_results(uint8_t id, uint32_t qflag_addr){
+
+#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id < 8) ps[id] = MIN(ps[id],ps[id+8]);
+#endif
+	barrier_wait(id);
+
+#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id < 4) ps[id] = MIN(ps[id],ps[id+4]);
+#endif
+	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16);
+	barrier_wait(id);
+
+#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id < 2) ps[id] = MIN(ps[id],ps[id+2]);
+#endif
+	if(id < 8) qflag[id] = mflags[id << 1];
+	barrier_wait(id);
+
+	if(id == 0){
+#ifdef COMPUTE_GLOBAL_PSTOP
+		ps[id] = MIN(ps[id],ps[id+1]);
+		g_ps = MIN(ps[id],g_ps);
+#endif
+		mram_ll_write32(qflag,qflag_addr);
+	}
 }
 
 void load_part_t(uint16_t cpart_i, uint32_t *buffer, uint8_t id){
@@ -182,6 +210,10 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t i = 0, j = 0, k = 0;
 	uint8_t qbit = 0;
 
+#ifdef COMPUTE_GLOBAL_PSTOP
+	uint32_t mx;
+	ps[id] = 0xFFFFFFFF;
+#endif
 
 #ifdef CHECK_ONLY_ACTIVE_POINTS
 	uint8_t qi = id * TASKLETS;
@@ -221,21 +253,46 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 				break;
 			}
 		}
+#ifdef COMPUTE_GLOBAL_PSTOP
+		if(dt == 0 && (cpart_i == cpart_j)){
+			mx = MAX(MAX(q[0],q[1]),MAX(q[2],q[3]));
+			ps[id] = MIN(mx,ps[id]);
+		}
+#endif
 		qbit++;
 	}
 	barrier_wait(id);
-
 	mflags[id] = tflag;
+	acc_results(id,qflag_addr);
+
+/*#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id < 8) ps[id] = MIN(ps[id],ps[id+8]);
+#endif
 	barrier_wait(id);
+
+#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id < 4) ps[id] = MIN(ps[id],ps[id+4]);
+#endif
 	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16);
 	barrier_wait(id);
+
+#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id < 2) ps[id] = MIN(ps[id],ps[id+2]);
+#endif
 	if(id < 8) qflag[id] = mflags[id << 1];
 	barrier_wait(id);
-	if(id==0) mram_ll_write32(qflag,qflag_addr);
+
+	if(id == 0){
+#ifdef COMPUTE_GLOBAL_PSTOP
+		ps[id] = MIN(ps[id],ps[id+1]);
+		g_ps = MIN(ps[id],g_ps);
+#endif
+		mram_ll_write32(qflag,qflag_addr);
+	}*/
 }
 
 void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
-	uint32_t qflag_offset;
+	uint32_t qflag_addr;
 
 	if(id < 8){
 		load_part_t(cpart_i,window,id);
@@ -245,10 +302,10 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		//load_part_8d(cpart_i,window);
 		//load_part_8d(cpart_j,Cj);
 
-		uint32_t pflag_offset = DSKY_FLAGS_ADDR + (cpart_i << 5);
-		qflag_offset = DSKY_FLAGS_ADDR + (cpart_j << 5);
-		mram_ll_read32(pflag_offset,pflag); // read flags of C_i set//used by all threads
-		mram_ll_read32(qflag_offset,qflag); // read flags of C_j set//need to extract portion of tasklet
+		uint32_t pflag_addr = DSKY_FLAGS_ADDR + (cpart_i << 5);
+		qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
+		mram_ll_read32(pflag_addr,pflag); // read flags of C_i set//used by all threads
+		mram_ll_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet
 
 		uint32_t pbvec_addr = DSKY_BVECS_ADDR + (cpart_i * 256 * 4);
 		uint32_t qbvec_addr = DSKY_BVECS_ADDR + (cpart_j * 256 * 4);
@@ -262,6 +319,11 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t work_offset = POINTS_PER_T_VALUES * id;//
 	uint32_t i = 0, j = 0;
 	uint8_t qbit = 0;
+
+#ifdef COMPUTE_GLOBAL_PSTOP
+	uint32_t mx_0,mx_1;
+	ps[id] = 0xFFFFFFFF;
+#endif
 
 #ifdef CHECK_ONLY_ACTIVE_POINTS
 	calc_active_p(id);
@@ -298,21 +360,50 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 				break;
 			}
 		}
-
+#ifdef COMPUTE_GLOBAL_PSTOP
+		if(dt == 0){
+			mx_0 = MAX(q[0],q[1]);
+			mx_1 = MAX(q[2],q[3]);
+			mx_0 = MAX(mx_0,mx_1);
+			mx_1 = MAX(q[4],q[5]);
+			mx_0 = MAX(mx_0,mx_1);
+			mx_1 = MAX(q[6],q[7]);
+			ps[id] = MIN(ps[id],MAX(mx_0,mx_1));
+		}
+#endif
 		qbit++;
 	}
+	barrier_wait(id);
 	mflags[id] = tflag;
+	acc_results(id,qflag_addr);
+
+/*#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id < 8) ps[id] = MIN(ps[id],ps[id+8]);
+#endif
 	barrier_wait(id);
+
 	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16);
+#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id < 4) ps[id] = MIN(ps[id],ps[id+4]);
+#endif
 	barrier_wait(id);
+
 	if(id < 8) qflag[id] = mflags[id << 1];
+#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id < 2) ps[id] = MIN(ps[id],ps[id+2]);
+#endif
 	barrier_wait(id);
-	if(id==0) mram_ll_write32(qflag,qflag_offset);
-	//barrier_wait(id);
+	if(id==0){
+#ifdef COMPUTE_GLOBAL_PSTOP
+		ps[id] = MIN(ps[id],ps[id+1]);
+		g_ps = MIN(ps[id],g_ps);
+#endif
+		mram_ll_write32(qflag,qflag_offset);
+	}*/
 }
 
 void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
-	uint32_t qflag_offset;
+	uint32_t qflag_addr;
 
 	load_part_t(cpart_i,window,id);
 	load_part_t(cpart_j,Cj,id);
@@ -321,10 +412,10 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		//load_part_16d(cpart_i,window);
 		//load_part_16d(cpart_j,Cj);
 
-		uint32_t pflag_offset = DSKY_FLAGS_ADDR + (cpart_i << 5);
-		qflag_offset = DSKY_FLAGS_ADDR + (cpart_j << 5);
-		mram_ll_read32(pflag_offset,pflag); // read flags of C_i set//used by all threads
-		mram_ll_read32(qflag_offset,qflag); // read flags of C_j set//need to extract portion of tasklet
+		uint32_t pflag_addr = DSKY_FLAGS_ADDR + (cpart_i << 5);
+		qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
+		mram_ll_read32(pflag_addr,pflag); // read flags of C_i set//used by all threads
+		mram_ll_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet
 
 		uint32_t pbvec_addr = DSKY_BVECS_ADDR + (cpart_i * 256 * 4);
 		uint32_t qbvec_addr = DSKY_BVECS_ADDR + (cpart_j * 256 * 4);
@@ -338,6 +429,10 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t work_offset = POINTS_PER_T_VALUES * id;//
 	uint32_t i = 0, j = 0;
 	uint8_t qbit = 0;
+
+#ifdef COMPUTE_GLOBAL_PSTOP
+	ps[id] = 0xFFFFFFFF;
+#endif
 
 #ifdef CHECK_ONLY_ACTIVE_POINTS
 	calc_active_p(id);
@@ -379,16 +474,42 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 				break;
 			}
 		}
+#ifdef COMPUTE_GLOBAL_PSTOP
+		if(dt == 0 && (cpart_i == cpart_j)){
+			uint32_t mx_0,mx_1,mx_2,mx_3,mx_4,mx_5,mx_6,mx_7;
+			mx_0 = MAX(q[0],q[1]);
+			mx_1 = MAX(q[2],q[3]);
+			mx_2 = MAX(q[4],q[5]);
+			mx_3 = MAX(q[6],q[7]);
+			mx_4 = MAX(q[8],q[9]);
+			mx_5 = MAX(q[10],q[11]);
+			mx_6 = MAX(q[12],q[13]);
+			mx_7 = MAX(q[14],q[15]);
+
+			mx_0 = MAX(mx_0,mx_1);
+			mx_2 = MAX(mx_2,mx_3);
+			mx_4 = MAX(mx_4,mx_5);
+			mx_6 = MAX(mx_6,mx_7);
+
+			mx_0 = MAX(mx_0,mx_2);
+			mx_4 = MAX(mx_4,mx_6);
+
+			ps[id] = MIN(ps[id],MAX(mx_0,mx_4));
+		}
+#endif
 
 		qbit++;
 	}
-	mflags[id] = tflag;
 	barrier_wait(id);
+	mflags[id] = tflag;
+	acc_results(id,qflag_addr);
+
+	/*barrier_wait(id);
 	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16);
 	barrier_wait(id);
 	if(id < 8) qflag[id] = mflags[id << 1];
 	barrier_wait(id);
-	if(id==0) mram_ll_write32(qflag,qflag_offset);
+	if(id==0) mram_ll_write32(qflag,qflag_addr);*/
 }
 
 #endif

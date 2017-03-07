@@ -49,22 +49,42 @@ int main(){
 	uint8_t id = me();
 	init_v2(id);
 	barrier_wait(id);
-	int16_t i = 0 , j = 0;
+	int32_t i = 0 , j = 0;
+	uint32_t p = 4;
 
 	if(D==4){
-		cmp_part_4d(id,0,0);
+		/*cmp_part_4d(id,0,0);
 		cmp_part_4d(id,0,1);
-		cmp_part_4d(id,1,1);
+		cmp_part_4d(id,1,1);*/
+
+		for(i = 0;i<p;i++){
+			for(j = 0;j<i;j++){
+				cmp_part_4d(id,j,i);
+			}
+			cmp_part_4d(id,i,i);
+		}
 	}
 	else if(D==8){
-		cmp_part_8d(id,0,0);
-		cmp_part_8d(id,0,1);
-		cmp_part_8d(id,1,1);
+		//cmp_part_8d(id,0,0);
+		//cmp_part_8d(id,0,1);
+		//cmp_part_8d(id,1,1);
+		for(i = 0;i<p;i++){
+			for(j = 0;j<i;j++){
+				cmp_part_8d(id,j,i);
+			}
+			cmp_part_8d(id,i,i);
+		}
 	}
 	else if(D==16){
-		cmp_part_16d(id,0,0);
-		cmp_part_16d(id,0,1);
-		cmp_part_16d(id,1,1);
+		//cmp_part_16d(id,0,0);
+		//cmp_part_16d(id,0,1);
+		//cmp_part_16d(id,1,1);
+		for(i = 0;i<p;i++){
+			for(j = 0;j<i;j++){
+				cmp_part_16d(id,j,i);
+			}
+			cmp_part_16d(id,i,i);
+		}
 	}
 	//else if(D==16) cmp_part_16d(id,0,0);
 

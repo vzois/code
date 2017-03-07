@@ -211,7 +211,7 @@ print "-----------------------------------------------------"
 sk=[]
 sky_ret=[]
 print "Computing the skyline..."
-if True:
+if False:
     sk=sfs_test(points,rank)
     sky_ret=kss_test(points,window,rank,pstop)#points: list of lists, window: indices, rank: values of max dim, pstop: single value min(max(window_points))
     

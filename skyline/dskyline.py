@@ -245,6 +245,7 @@ def dskyline():
     global PSIZE
     global dt_num_red,dt_num
     
+    count_part_alive = 0
     gsky = []
     part = 0
     part_index = 0;
@@ -295,10 +296,14 @@ def dskyline():
                 gsky.append(q)#append point in the global skyline
                 gsky_b.append(bp[j])# append bit vector to skyline
         
-        if (part_index < 2 and (len(gsky_i) > 0)) and True:#debugging data
+        if (len(gsky_i) > 0):
+            count_part_alive+=1
+            
+        if (part_index < 4 and (len(gsky_i) > 0)) and True:#debugging data
             print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
             bit_vectors(gsky_i)
+            
                 
         part_index+=1
         total+=PSIZE
@@ -306,6 +311,7 @@ def dskyline():
     print "dkyline len:",len(gsky), hex(len(gsky))
     print "dskyline full DTs:",dt_num
     print "dskyline reduced DTs:",dt_num_red
+    print "dskyline alive part count:",count_part_alive
 
 print "Generating data...."    
 fp = open("common/config.h","r")
