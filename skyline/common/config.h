@@ -6,7 +6,7 @@
 
 //Dataset Configuration
 #define DISTR "i"
-#define DATA_N 4096
+#define DATA_N 2048
 #define DPUS 1
 #define N (DATA_N / DPUS)
 #define D 4

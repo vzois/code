@@ -307,7 +307,7 @@ def dskyline():
         if (len(gsky_i) > 0):
             count_part_alive+=1
             
-        if (part_index < 2 and (len(gsky_i) > 0)) and True:#debugging data
+        if (part_index < 2 or (len(gsky_i) > 0)) and True:#debugging data
             print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
             bit_vectors(gsky_i)
@@ -384,17 +384,17 @@ else:
     print "create partition elapsed time:",createpart_t
 
 #Execution Information
-#dpus = 2048
-#part_n = (N*dpus)/PSIZE
-#part_1 = N/PSIZE
-#print "dpus used:",dpus
-#print "single dpu partition count on complete data:",part_n
-#print "multi dpu partition count on complete data:",part_1
+dpus = 2048
+part_n = (N*dpus)/PSIZE
+part_1 = N/PSIZE
+print "dpus used:",dpus
+print "single dpu partition count on complete data:",part_n
+print "multi dpu partition count on complete data:",part_1
 
-#cmp_single_dpu = spiral(N/PSIZE,1)
-#cmp_multi_dpu = spiral((N*dpus)/PSIZE,2048)
-#print "single dpu comparison count:",cmp_single_dpu
-#print "multi dpu comparison count:",cmp_multi_dpu
+cmp_single_dpu = spiral(N/PSIZE,1)
+cmp_multi_dpu = spiral((N*dpus)/PSIZE,2048)
+print "single dpu comparison count:",cmp_single_dpu
+print "multi dpu comparison count:",cmp_multi_dpu
 
 storeDSkyData(parts_p,parts_r,parts_i,parts_b)
 

@@ -1,6 +1,7 @@
 #include<defs.h>
 #include<alloc.h>
 #include <mram_ll.h>
+#include <built_ins.h>
 
 #include "../common/config.h"
 #include "../common/tools.h"
@@ -9,9 +10,10 @@
 
 #ifdef V_2
 
-#define CHECK_ONLY_ACTIVE_POINTS
+//#define CHECK_ONLY_ACTIVE_POINTS
 #define COMPUTE_GLOBAL_PSTOP
 #define USE_BIT_VECTORS
+#define USE_INTRINSIC_FUNCTION
 
 uint32_t *window;//At most 16KB
 uint32_t *Cj;//At most 16KB
@@ -26,6 +28,8 @@ uint8_t pflag_a[256];//
 uint8_t qflag_a[256];
 
 uint32_t debug;
+uint32_t *qdebug;
+uint32_t *pdebug;
 uint8_t pc[256];//At most 256 bytes, used to precount the bit vectors
 
 uint32_t g_ps;//global pstop
@@ -54,7 +58,6 @@ uint8_t DT_(uint32_t *p, uint32_t *q){
 
 void init_v2(uint8_t id){
 	uint32_t pflag_offset = DSKY_FLAGS_ADDR + id * (N >> 7);//offset by 1 byte for each point
-	uint32_t iter = (N / TASKLETS) / PSIZE;
 	uint32_t i = 0;
 
 	if(id < 1){
@@ -70,18 +73,21 @@ void init_v2(uint8_t id){
 	ps[id] = 0xFFFFFFFF;
 	barrier_wait(id);
 
-
 	if (id < 8) pflag[id] = 0xFFFFFFFF;
 	barrier_wait(id);
 
-	for(i = 0;i<iter;i++){
+	uint32_t low = (id * P)/TASKLETS;
+	uint32_t high = ((id+1) * P)/TASKLETS;
+	for(i = low;i<high;i++){
 		mram_ll_write32(pflag,pflag_offset);
 		pflag_offset+=32;
 	}
 
+	#ifndef USE_INTRINSIC_FUNCTION
 	for(i=id;i<256;i+=TASKLETS){
 		popc_8b(i,&pc[i]);//bit count map
 	}
+	#endif
 }
 
 //Compute points that are alive in order to consider them for prunning
@@ -199,8 +205,8 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		mram_ll_read32(pflag_addr,pflag); // read flags of window set//used by all threads//Indicate which points are alieve
 		mram_ll_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet//Indicate which points are alive
 
-		uint32_t pbvec_addr = DSKY_BVECS_ADDR + (cpart_i * 256 * 4);//Bit vector for partition i // Used for cheap DTs
-		uint32_t qbvec_addr = DSKY_BVECS_ADDR + (cpart_j * 256 * 4);//Bit vector for partition j // Used for cheap DTs
+		uint32_t pbvec_addr = DSKY_BVECS_ADDR + (cpart_i * PSIZE * 4);//Bit vector for partition i // Used for cheap DTs
+		uint32_t qbvec_addr = DSKY_BVECS_ADDR + (cpart_j * PSIZE * 4);//Bit vector for partition j // Used for cheap DTs
 		mram_ll_read1024_new(pbvec_addr,pbvec);
 		mram_ll_read1024_new(qbvec_addr,qbvec);
 	}
@@ -244,11 +250,23 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			uint8_t Mj = (pbvec[vj_offset] & 0xF);
 			uint8_t Qj = (pbvec[vj_offset] & 0xF0) >> 4;
 
+			#ifndef USE_INTRINSIC_FUNCTION
 			if ((Mj | Mi) > Mi) continue;
 			else if(pc[Mi] < pc[Mj]) continue;
 			else if((pc[Mi] == pc[Mj]) & (Mj != Mi)) continue;
 			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
 			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
+			#endif
+			#ifdef USE_INTRINSIC_FUNCTION
+			if ((Mj | Mi) > Mi) continue;
+			uint32_t ci,cj;
+			__builtin_cao_rr(ci,Mi);
+			__builtin_cao_rr(cj,Mj);
+			if(ci < cj) continue;
+			else if((ci == cj) & (Mj != Mi)) continue;
+			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
+			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
+			#endif
 #endif
 			if(DT_(p,q) == 1){
 				tflag &= ~(0x1 << qbit);//Set flag for dominance
@@ -324,15 +342,28 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			if (pflag_a[i>>3] == 0){ continue; } //Check if point is active// divide index by 8
 #endif
 			uint32_t *p = &window[i];
+#ifdef USE_BIT_VECTORS
 			uint16_t vj_offset = i >> 3;//divide index by 8
 			uint8_t Mj = (pbvec[vj_offset] & 0xFF);
 			uint8_t Qj = (pbvec[vj_offset] & 0xFF00) >> 8;
-#ifdef USE_BIT_VECTORS
+
+			#ifndef USE_INTRINSIC_FUNCTION
 			if ((Mj | Mi) > Mi) continue;
 			else if(pc[Mi] < pc[Mj]) continue;
 			else if((pc[Mi] == pc[Mj]) & (Mj != Mi)) continue;
 			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
 			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
+			#endif
+			#ifdef USE_INTRINSIC_FUNCTION
+			if ((Mj | Mi) > Mi) continue;
+			uint32_t ci,cj;
+			__builtin_cao_rr(ci,Mi);
+			__builtin_cao_rr(cj,Mj);
+			if(ci < cj) continue;
+			else if((ci == cj) & (Mj != Mi)) continue;
+			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
+			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
+			#endif
 #endif
 			if(DT_(p,q) == 1){
 				tflag &= ~(0x1 << qbit);//Set flag for dominance
@@ -415,13 +446,31 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			uint8_t Mj = (pbvec[vj_offset] & 0xFFFF);//16 bit vector
 			uint8_t Qj = (pbvec[vj_offset] & 0xFFFF0000) >> 16;
 
-			if ((Mj | Mi) > Mi) continue;
+			/*if ((Mj | Mi) > Mi) continue;
 			uint8_t ci = pc[Mi & 0xFF] + pc[Mi>>8];
 			uint8_t cj = pc[Mj & 0xFF] + pc[Mj>>8];
 			if(ci < cj) continue;
 			else if((ci == cj) & (Mj != Mi)) continue;
 			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
+			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;*/
+
+			#ifndef USE_INTRINSIC_FUNCTION
+			if ((Mj | Mi) > Mi) continue;
+			else if(pc[Mi] < pc[Mj]) continue;
+			else if((pc[Mi] == pc[Mj]) & (Mj != Mi)) continue;
+			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
 			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
+			#endif
+			#ifdef USE_INTRINSIC_FUNCTION
+			if ((Mj | Mi) > Mi) continue;
+			uint32_t ci,cj;
+			__builtin_cao_rr(ci,Mi);
+			__builtin_cao_rr(cj,Mj);
+			if(ci < cj) continue;
+			else if((ci == cj) & (Mj != Mi)) continue;
+			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
+			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
+			#endif
 #endif
 			if(DT_(p,q) == 1){
 				tflag &= ~(0x1 << qbit);//Set flag for dominance

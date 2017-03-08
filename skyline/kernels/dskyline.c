@@ -53,9 +53,9 @@ int main(){
 	uint32_t p = P;
 
 	if(D==4){
-		/*cmp_part_4d(id,0,0);
-		cmp_part_4d(id,0,1);
-		cmp_part_4d(id,1,1);*/
+		//cmp_part_4d(id,0,0);
+		//cmp_part_4d(id,0,1);
+		//cmp_part_4d(id,1,1);
 
 		for(i = 0;i<p;i++){
 			for(j = 0;j<i;j++){
