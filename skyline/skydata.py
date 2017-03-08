@@ -3,10 +3,6 @@ import struct
 from subprocess import call
 import time
 
-#N = int(sys.argv[1])
-#D = int(sys.argv[2])
-#distr = sys.argv[3]
-
 scale = 1024*1024*1024
 
 def genData(N,D,distr):
@@ -15,7 +11,7 @@ def genData(N,D,distr):
     print filename
     #Call d
     f = open(filename, "w")
-    arg_call = ["./../../validation/bin/randdataset", "-"+distr,"-n",str(N),"-d",str(D),"-s",str(int(time.time()))]
+    arg_call = ["./workload/randdataset-1.1.0/src/randdataset", "-"+distr,"-n",str(N),"-d",str(D),"-s",str(int(time.time()))]
     #arg_call = ["./../../bin/randdataset", "-"+distr,"-n",str(N),"-d",str(D)]
     print arg_call
     call(arg_call,stdout=f)
@@ -73,8 +69,11 @@ def genData(N,D,distr):
     f.close()
     fw.close()
     return points
+
+
+#N = int(sys.argv[1])
+#D = int(sys.argv[2])
+#distr = sys.argv[3]
 #genData(N,D,distr)
-
-
 
 

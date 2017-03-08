@@ -77,12 +77,16 @@ clean:
 	rm -rf radixselect.bin radixselect.syms
 	rm -rf pradixselect.bin pradixselect.syms
 	rm -rf $(HOST_EXEC)
+	rm -rf dskyline.bin
+	rm -rf dskyline.syms
+
+purge:
 	rm -rf d_*
 	rm -rf runtime_data/points.bin
 	rm -rf runtime_data/sum.bin
 	rm -rf candidates0.bin
-	rm -rf dskyline.bin
-	rm -rf dskyline.syms
+	rm -rf runtime_data/*
+
 	
 	
 	

@@ -258,19 +258,19 @@ def dskyline():
     gsky_b = list()
     early_stop = 0
     for i in range(len(parts_p)):
-        pp=parts_p[i]
-        rp=parts_r[i]
-        ip=parts_i[i]
-        bp=parts_b[i]
+        pp=parts_p[i]#get points in the partition
+        rp=parts_r[i]#get level of each point in the partition
+        ip=parts_i[i]#get index of each point in the partition
+        bp=parts_b[i]#get bit vectors for each point in the partition
         
-        l = rp[0] if minC else (rp[0] - (D-1)*scale)
-        if g_ps <= l:
-            print hex(g_ps),hex(rp[0]),[hex(d) for d in  pp[0]]
+        l = rp[0] if minC else (rp[0] - (D-1)*scale)#compute level based on monotone function
+        if g_ps <= l:#if level greater than or equal to the global pstop then all partitions including this are pruned
+            print "Stoping on: <g_ps>=",hex(g_ps),",<level>=",hex(rp[0]),",<first point of part>=",[hex(d) for d in  pp[0]]
             break
         early_stop+=1
         
         tsky = sfs_p(pp,rp,bp) # self prune partition
-        for j in tsky: # prune surviving points
+        for j in tsky: # prune surviving points against global skyline
             q = pp[j]
             Mi = bp[j][0]
             Qi = bp[j][1]
@@ -307,7 +307,7 @@ def dskyline():
         if (len(gsky_i) > 0):
             count_part_alive+=1
             
-        if (part_index < 4 or (len(gsky_i) > 0)) and True:#debugging data
+        if (part_index < 2 and (len(gsky_i) > 0)) and True:#debugging data
             print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
             bit_vectors(gsky_i)
@@ -317,13 +317,14 @@ def dskyline():
         total+=PSIZE
         gsky_i = list()
     print "dkyline len:",len(gsky), hex(len(gsky))
-    print "dskyline full DTs:",dt_num
-    print "dskyline reduced DTs:",dt_num_red
+    print "dskyline total full DTs:",dt_num
+    print "dskyline reduced full DTs:",dt_num_red
     print "dskyline alive part count:",count_part_alive
     print "dskyline early stop:",early_stop
 
 print "Generating data...."    
 fp = open("common/config.h","r")
+distr="i"
 for line in fp.readlines():
 #print line
     if line.strip().startswith("#define DATA_N"):
@@ -341,14 +342,18 @@ for line in fp.readlines():
         P = N/PSIZE
     elif line.strip().startswith("#define L"):
         L = int(line.strip().split(" ")[2])
+    elif line.strip().startswith("#define DISTR"):
+        distr = line.strip().split(" ")[2][1]
 
 fp.close()    
         
 print "scale factor:",scale    
 
 minC = True
-distr="i"#Choose distribution
+print distr
+#distr="i"#Choose distribution
 points=genData(N,D,distr)
+
 if minC:
     rank = [min(points[i]) for i in range(N)]
 else:
