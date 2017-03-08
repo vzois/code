@@ -50,7 +50,7 @@ int main(){
 	init_v2(id);
 	barrier_wait(id);
 	int32_t i = 0 , j = 0;
-	uint32_t p = 4;
+	uint32_t p = P;
 
 	if(D==4){
 		/*cmp_part_4d(id,0,0);

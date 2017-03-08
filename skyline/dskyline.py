@@ -22,6 +22,7 @@ parts_b=list()
 dt_num_red = 0
 dt_num = 0
 
+
 def pfmtb(v):
     return "{0:#0{1}x}".format(v,10)
     #return str(format(v, fmt))
@@ -241,6 +242,8 @@ def bit_vectors(gsky_i):
     print "}>>"
 
 def dskyline():
+    global D
+    global minC
     global parts_p,parts_r, parts_i, parts_b
     global PSIZE
     global dt_num_red,dt_num
@@ -253,14 +256,19 @@ def dskyline():
     gsky_i = list()
     g_ps = 0xFFFFFFFF
     gsky_b = list()
+    early_stop = 0
     for i in range(len(parts_p)):
         pp=parts_p[i]
         rp=parts_r[i]
         ip=parts_i[i]
         bp=parts_b[i]
         
-        if g_ps <= rp[0] : # stop point reached
+        l = rp[0] if minC else (rp[0] - (D-1)*scale)
+        if g_ps <= l:
+            print hex(g_ps),hex(rp[0]),[hex(d) for d in  pp[0]]
             break
+        early_stop+=1
+        
         tsky = sfs_p(pp,rp,bp) # self prune partition
         for j in tsky: # prune surviving points
             q = pp[j]
@@ -299,7 +307,7 @@ def dskyline():
         if (len(gsky_i) > 0):
             count_part_alive+=1
             
-        if (part_index < 4 and (len(gsky_i) > 0)) and True:#debugging data
+        if (part_index < 4 or (len(gsky_i) > 0)) and True:#debugging data
             print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
             bit_vectors(gsky_i)
@@ -312,6 +320,7 @@ def dskyline():
     print "dskyline full DTs:",dt_num
     print "dskyline reduced DTs:",dt_num_red
     print "dskyline alive part count:",count_part_alive
+    print "dskyline early stop:",early_stop
 
 print "Generating data...."    
 fp = open("common/config.h","r")
@@ -337,13 +346,15 @@ fp.close()
         
 print "scale factor:",scale    
 
+minC = True
 distr="i"#Choose distribution
 points=genData(N,D,distr)
-rank = [min(min(points[i]),sum(points[i])) for i in range(N)]
-#rank = [sum(points[i]) for i in range(N)]
-#rank = [min(points[i]) for i in range(N)]
+if minC:
+    rank = [min(points[i]) for i in range(N)]
+else:
+    rank = [sum(points[i]) for i in range(N)]
 
-if False:
+if True:
     dskyline_t = time.time()
     createPartitions(points,rank)
     dskyline()
@@ -368,17 +379,17 @@ else:
     print "create partition elapsed time:",createpart_t
 
 #Execution Information
-dpus = 2048
-part_n = (N*dpus)/PSIZE
-part_1 = N/PSIZE
-print "dpus used:",dpus
-print "single dpu partition count on complete data:",part_n
-print "multi dpu partition count on complete data:",part_1
+#dpus = 2048
+#part_n = (N*dpus)/PSIZE
+#part_1 = N/PSIZE
+#print "dpus used:",dpus
+#print "single dpu partition count on complete data:",part_n
+#print "multi dpu partition count on complete data:",part_1
 
-cmp_single_dpu = spiral(N/PSIZE,1)
-cmp_multi_dpu = spiral((N*dpus)/PSIZE,2048)
-print "single dpu comparison count:",cmp_single_dpu
-print "multi dpu comparison count:",cmp_multi_dpu
+#cmp_single_dpu = spiral(N/PSIZE,1)
+#cmp_multi_dpu = spiral((N*dpus)/PSIZE,2048)
+#print "single dpu comparison count:",cmp_single_dpu
+#print "multi dpu comparison count:",cmp_multi_dpu
 
 storeDSkyData(parts_p,parts_r,parts_i,parts_b)
 

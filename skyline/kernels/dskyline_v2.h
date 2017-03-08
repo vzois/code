@@ -84,6 +84,7 @@ void init_v2(uint8_t id){
 	}
 }
 
+//Compute points that are alive in order to consider them for prunning
 void calc_active_p(uint8_t id){
 	uint32_t i = 0;
 	for(i=id;i<256;i+=16){
@@ -95,31 +96,32 @@ void calc_active_p(uint8_t id){
 	barrier_wait(id);
 }
 
+//After comparing two partitions find global p_stop and store update flags for alive points into MRAM
 void acc_results(uint8_t id, uint32_t qflag_addr){
 
 #ifdef COMPUTE_GLOBAL_PSTOP
-	if(id < 8) ps[id] = MIN(ps[id],ps[id+8]);
+	if(id < 8) ps[id] = MIN(ps[id],ps[id+8]);//Reduce pstop values
 #endif
 	barrier_wait(id);
 
 #ifdef COMPUTE_GLOBAL_PSTOP
-	if(id < 4) ps[id] = MIN(ps[id],ps[id+4]);
+	if(id < 4) ps[id] = MIN(ps[id],ps[id+4]);//Reduce pstop values
 #endif
-	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16);
+	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16); //Merge flags
 	barrier_wait(id);
 
 #ifdef COMPUTE_GLOBAL_PSTOP
-	if(id < 2) ps[id] = MIN(ps[id],ps[id+2]);
+	if(id < 2) ps[id] = MIN(ps[id],ps[id+2]);//Reduce pstop values
 #endif
-	if(id < 8) qflag[id] = mflags[id << 1];
+	if(id < 8) qflag[id] = mflags[id << 1];//Merge flags
 	barrier_wait(id);
 
 	if(id == 0){
 #ifdef COMPUTE_GLOBAL_PSTOP
-		ps[id] = MIN(ps[id],ps[id+1]);
-		g_ps = MIN(ps[id],g_ps);
+		ps[id] = MIN(ps[id],ps[id+1]);//Reduce pstop values
+		g_ps = MIN(ps[id],g_ps);//Reduce pstop values
 #endif
-		mram_ll_write32(qflag,qflag_addr);
+		mram_ll_write32(qflag,qflag_addr);//Write compute flags to MRAM
 	}
 }
 
@@ -184,7 +186,7 @@ void load_part_16d(uint16_t cpart_i, uint32_t *buffer){
 void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	uint32_t qflag_addr;
 
-	if(id < 4){
+	if(id < 4){//Each tasklet reads 1024 bytes// Fixed PSIZE requires 4 tasklets to read 4096 bytes (256 * 4 * 4)
 		load_part_t(cpart_i,window,id);
 		load_part_t(cpart_j,Cj,id);
 	}
@@ -194,11 +196,11 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 
 		uint32_t pflag_addr = DSKY_FLAGS_ADDR + (cpart_i << 5);
 		qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-		mram_ll_read32(pflag_addr,pflag); // read flags of C_i set//used by all threads
-		mram_ll_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet
+		mram_ll_read32(pflag_addr,pflag); // read flags of window set//used by all threads//Indicate which points are alieve
+		mram_ll_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet//Indicate which points are alive
 
-		uint32_t pbvec_addr = DSKY_BVECS_ADDR + (cpart_i * 256 * 4);
-		uint32_t qbvec_addr = DSKY_BVECS_ADDR + (cpart_j * 256 * 4);
+		uint32_t pbvec_addr = DSKY_BVECS_ADDR + (cpart_i * 256 * 4);//Bit vector for partition i // Used for cheap DTs
+		uint32_t qbvec_addr = DSKY_BVECS_ADDR + (cpart_j * 256 * 4);//Bit vector for partition j // Used for cheap DTs
 		mram_ll_read1024_new(pbvec_addr,pbvec);
 		mram_ll_read1024_new(qbvec_addr,qbvec);
 	}
@@ -225,19 +227,20 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 #ifdef CHECK_ONLY_ACTIVE_POINTS
 		if( ((tflag >> qbit) & 0x1) == 0x0 ){ qbit++; continue; }//prune point only if it is alive from previous iteration//
 #endif
-		uint32_t *q = &Cj[work_offset + j];
-		uint16_t vi_offset = (work_offset + j) >> 2;
-		uint8_t Mi = (qbvec[vi_offset] & 0xF);
-		uint8_t Qi = (qbvec[vi_offset] & 0xF0) >> 4;
-		uint8_t dt = 0;
-
-		for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){//For each point in Ci partition
+		uint32_t *q = &Cj[work_offset + j];//Pointer to point being tested
+		uint8_t dt = 0;//Set if point is dominated
+#ifdef USE_BIT_VECTORS
+		uint16_t vi_offset = (work_offset + j) >> 2;//load bit vector for q point// divide by 4 since j increases by 4
+		uint8_t Mi = (qbvec[vi_offset] & 0xF);//Media level bit vector
+		uint8_t Qi = (qbvec[vi_offset] & 0xF0) >> 4;//Quartile level bit vector
+#endif
+		for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){//For each point in window partition//The partition we check against
 #ifdef CHECK_ONLY_ACTIVE_POINTS
 			if (pflag_a[i>>2] == 0){ continue; } //Check if point is active// divide index by 4
 #endif
-
 			uint32_t *p = &window[i];
-			uint16_t vj_offset = i >> 2;
+#ifdef USE_BIT_VECTORS//Use Bit vectors for cheap DTs// Points are incomparable if any of the following holds//
+			uint16_t vj_offset = i >> 2;//index i inc by D// divide by 4
 			uint8_t Mj = (pbvec[vj_offset] & 0xF);
 			uint8_t Qj = (pbvec[vj_offset] & 0xF0) >> 4;
 
@@ -246,15 +249,15 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			else if((pc[Mi] == pc[Mj]) & (Mj != Mi)) continue;
 			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
 			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
-
+#endif
 			if(DT_(p,q) == 1){
 				tflag &= ~(0x1 << qbit);//Set flag for dominance
 				dt = 1;
 				break;
 			}
 		}
-#ifdef COMPUTE_GLOBAL_PSTOP
-		if(dt == 0 && (cpart_i == cpart_j)){
+#ifdef COMPUTE_GLOBAL_PSTOP//minimax rule to update global pstop
+		if(dt == 0 && (cpart_i == cpart_j)){//Each tasklet local pstop//merge at acc_results
 			mx = MAX(MAX(q[0],q[1]),MAX(q[2],q[3]));
 			ps[id] = MIN(mx,ps[id]);
 		}
@@ -263,32 +266,7 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	}
 	barrier_wait(id);
 	mflags[id] = tflag;
-	acc_results(id,qflag_addr);
-
-/*#ifdef COMPUTE_GLOBAL_PSTOP
-	if(id < 8) ps[id] = MIN(ps[id],ps[id+8]);
-#endif
-	barrier_wait(id);
-
-#ifdef COMPUTE_GLOBAL_PSTOP
-	if(id < 4) ps[id] = MIN(ps[id],ps[id+4]);
-#endif
-	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16);
-	barrier_wait(id);
-
-#ifdef COMPUTE_GLOBAL_PSTOP
-	if(id < 2) ps[id] = MIN(ps[id],ps[id+2]);
-#endif
-	if(id < 8) qflag[id] = mflags[id << 1];
-	barrier_wait(id);
-
-	if(id == 0){
-#ifdef COMPUTE_GLOBAL_PSTOP
-		ps[id] = MIN(ps[id],ps[id+1]);
-		g_ps = MIN(ps[id],g_ps);
-#endif
-		mram_ll_write32(qflag,qflag_addr);
-	}*/
+	acc_results(id,qflag_addr);//accumulate pstop // merge flags to update alive points
 }
 
 void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
@@ -334,10 +312,12 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		if( ((tflag >> qbit) & 0x1) == 0x0 ){ qbit++; continue; }//prune point only if it is alive from previous iteration
 #endif
 		uint32_t *q = &Cj[work_offset + j];
+		uint8_t dt = 0;
+#ifdef USE_BIT_VECTORS
 		uint16_t vi_offset = (work_offset + j) >> 3;//divide index by 8
 		uint8_t Mi = (qbvec[vi_offset] & 0xFF);
 		uint8_t Qi = (qbvec[vi_offset] & 0xFF00) >> 8;
-		uint8_t dt = 0;
+#endif
 
 		for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){
 #ifdef CHECK_ONLY_ACTIVE_POINTS
@@ -347,13 +327,13 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			uint16_t vj_offset = i >> 3;//divide index by 8
 			uint8_t Mj = (pbvec[vj_offset] & 0xFF);
 			uint8_t Qj = (pbvec[vj_offset] & 0xFF00) >> 8;
-
+#ifdef USE_BIT_VECTORS
 			if ((Mj | Mi) > Mi) continue;
 			else if(pc[Mi] < pc[Mj]) continue;
 			else if((pc[Mi] == pc[Mj]) & (Mj != Mi)) continue;
 			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
 			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
-
+#endif
 			if(DT_(p,q) == 1){
 				tflag &= ~(0x1 << qbit);//Set flag for dominance
 				dt=1;
@@ -376,30 +356,6 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 	mflags[id] = tflag;
 	acc_results(id,qflag_addr);
-
-/*#ifdef COMPUTE_GLOBAL_PSTOP
-	if(id < 8) ps[id] = MIN(ps[id],ps[id+8]);
-#endif
-	barrier_wait(id);
-
-	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16);
-#ifdef COMPUTE_GLOBAL_PSTOP
-	if(id < 4) ps[id] = MIN(ps[id],ps[id+4]);
-#endif
-	barrier_wait(id);
-
-	if(id < 8) qflag[id] = mflags[id << 1];
-#ifdef COMPUTE_GLOBAL_PSTOP
-	if(id < 2) ps[id] = MIN(ps[id],ps[id+2]);
-#endif
-	barrier_wait(id);
-	if(id==0){
-#ifdef COMPUTE_GLOBAL_PSTOP
-		ps[id] = MIN(ps[id],ps[id+1]);
-		g_ps = MIN(ps[id],g_ps);
-#endif
-		mram_ll_write32(qflag,qflag_offset);
-	}*/
 }
 
 void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
@@ -443,18 +399,18 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		if( ((tflag >> qbit) & 0x1) == 0x0 ){ qbit++; continue; }//prune point only if it is alive from previous iteration
 #endif
 		uint32_t *q = &Cj[work_offset + j];
+		uint8_t dt = 0;
+#ifdef USE_BIT_VECTORS
 		uint16_t vi_offset = (work_offset + j) >> 4;//divide index by 16
 		uint8_t Mi = (qbvec[vi_offset] & 0xFFFF);//16 bit vector
 		uint8_t Qi = (qbvec[vi_offset] & 0xFFFF0000) >> 16;
-		uint8_t dt = 0;
-
+#endif
 		for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){
-
 #ifdef CHECK_ONLY_ACTIVE_POINTS
 			if (pflag_a[i>>4] == 0){ continue; } //Check if point is active// divide index by 16
 #endif
-
 			uint32_t *p = &window[i];
+#ifdef USE_BIT_VECTORS
 			uint16_t vj_offset = i >> 4;//divide index by 16
 			uint8_t Mj = (pbvec[vj_offset] & 0xFFFF);//16 bit vector
 			uint8_t Qj = (pbvec[vj_offset] & 0xFFFF0000) >> 16;
@@ -462,12 +418,11 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			if ((Mj | Mi) > Mi) continue;
 			uint8_t ci = pc[Mi & 0xFF] + pc[Mi>>8];
 			uint8_t cj = pc[Mj & 0xFF] + pc[Mj>>8];
-
 			if(ci < cj) continue;
 			else if((ci == cj) & (Mj != Mi)) continue;
 			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
 			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
-
+#endif
 			if(DT_(p,q) == 1){
 				tflag &= ~(0x1 << qbit);//Set flag for dominance
 				dt=1;
