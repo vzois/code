@@ -10,7 +10,7 @@
 
 #ifdef V_2
 
-//#define CHECK_ONLY_ACTIVE_POINTS
+#define CHECK_ONLY_ACTIVE_POINTS
 #define COMPUTE_GLOBAL_PSTOP
 #define USE_BIT_VECTORS
 #define USE_INTRINSIC_FUNCTION
@@ -34,6 +34,8 @@ uint8_t pc[256];//At most 256 bytes, used to precount the bit vectors
 
 uint32_t g_ps;//global pstop
 uint32_t ps[TASKLETS];//At most 1KB, 16 * 16 * 4 => 1024 bytes
+uint32_t *qrank;
+uint32_t *qclear;
 
 void popc_8b(uint8_t v, uint8_t *c){
 	//c[0] = v;
@@ -67,6 +69,8 @@ void init_v2(uint8_t id){
 		Cj = dma_alloc(PSIZE_BYTES);
 		pbvec = dma_alloc(PSIZE << 2);
 		qbvec = dma_alloc(PSIZE << 2);
+		qrank = dma_alloc(32);
+		qclear = dma_alloc(32);
 
 		g_ps = 0xFFFFFFFF;
 	}
@@ -74,6 +78,7 @@ void init_v2(uint8_t id){
 	barrier_wait(id);
 
 	if (id < 8) pflag[id] = 0xFFFFFFFF;
+	if (id < 8) qclear[id] = 0x0;
 	barrier_wait(id);
 
 	uint32_t low = (id * P)/TASKLETS;
@@ -97,7 +102,6 @@ void calc_active_p(uint8_t id){
 		uint8_t pos = (i & 0xE0) >> 5;
 		uint8_t bit = (i & 0x1F);
 		pflag_a[i]=(pflag[pos] >> bit) & 0x1;//mark active points
-		//qflag_a[i]=(qflag[pos] >> bit) & 0x1;
 	}
 	barrier_wait(id);
 }
@@ -190,8 +194,23 @@ void load_part_16d(uint16_t cpart_i, uint32_t *buffer){
 }
 
 void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
-	uint32_t qflag_addr;
+#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id == 0){
+		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
+		mram_ll_read32(qrank_addr,qrank);
+	}
+	barrier_wait(id);
 
+	if( g_ps <= qrank[0] ){
+		if (id == 0){
+			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
+			mram_ll_write32(qclear,qflag_addr);
+		}
+		return ;
+	}
+#endif
+
+	uint32_t qflag_addr;
 	if(id < 4){//Each tasklet reads 1024 bytes// Fixed PSIZE requires 4 tasklets to read 4096 bytes (256 * 4 * 4)
 		load_part_t(cpart_i,window,id);
 		load_part_t(cpart_j,Cj,id);
@@ -288,6 +307,21 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 }
 
 void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
+#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id == 0){
+		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
+		mram_ll_read32(qrank_addr,qrank);
+	}
+	barrier_wait(id);
+
+	if( g_ps <= qrank[0] ){
+		if (id == 0){
+			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
+			mram_ll_write32(qclear,qflag_addr);
+		}
+		return ;
+	}
+#endif
 	uint32_t qflag_addr;
 
 	if(id < 8){
@@ -300,7 +334,7 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 
 		uint32_t pflag_addr = DSKY_FLAGS_ADDR + (cpart_i << 5);
 		qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-		mram_ll_read32(pflag_addr,pflag); // read flags of C_i set//used by all threads
+		mram_ll_read32(pflag_addr,pflag); // read flags of window set//used by all threads
 		mram_ll_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet
 
 		uint32_t pbvec_addr = DSKY_BVECS_ADDR + (cpart_i * 256 * 4);
@@ -390,6 +424,21 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 }
 
 void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
+#ifdef COMPUTE_GLOBAL_PSTOP
+	if(id == 0){
+		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
+		mram_ll_read32(qrank_addr,qrank);
+	}
+	barrier_wait(id);
+
+	if( g_ps <= qrank[0] ){
+		if (id == 0){
+			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
+			mram_ll_write32(qclear,qflag_addr);
+		}
+		return ;
+	}
+#endif
 	uint32_t qflag_addr;
 
 	load_part_t(cpart_i,window,id);

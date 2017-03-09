@@ -24,27 +24,6 @@ void count_sky_points(uint32_t p){//Debug Only
 	debug = r[0];
 }
 
-/*int main2(){
-	uint8_t id = me();
-	init(id);
-	barrier_wait(id);
-
-	//cmp_part(id,0,0);
-
-	uint32_t p = P;
-	cmp_part(id,0,0);
-	for(i = 1;i<p;i++){
-		for(j = 0;j<i;j++){
-			//if(i == 2 && j == 1) break;
-			cmp_part(id,j,i);
-		}
-		cmp_part(id,i,i);
-	}
-	if (id == 0) count_sky_points(p);
-
-	return 0;
-}*/
-
 int main(){
 	uint8_t id = me();
 	init_v2(id);
@@ -56,7 +35,6 @@ int main(){
 		//cmp_part_4d(id,0,0);
 		//cmp_part_4d(id,0,1);
 		//cmp_part_4d(id,1,1);
-
 		for(i = 0;i<p;i++){
 			for(j = 0;j<i;j++){
 				cmp_part_4d(id,j,i);
@@ -86,8 +64,6 @@ int main(){
 			cmp_part_16d(id,i,i);
 		}
 	}
-	//else if(D==16) cmp_part_16d(id,0,0);
-
 
 	return 0;
 }
