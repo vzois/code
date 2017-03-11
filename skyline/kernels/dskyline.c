@@ -26,7 +26,7 @@ void count_sky_points(uint32_t p){//Debug Only
 
 uint8_t test = 0;
 
-int main(){
+int main2(){
 	uint8_t id = me();
 	int32_t i,j;
 	uint32_t p;
@@ -77,7 +77,7 @@ int main(){
 	if(id == 0) test++;
 }
 
-int main2(){
+int main(){
 	uint8_t id = me();
 	init_v2(id);
 	barrier_wait(id);
