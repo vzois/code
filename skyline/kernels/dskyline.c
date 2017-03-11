@@ -24,7 +24,60 @@ void count_sky_points(uint32_t p){//Debug Only
 	debug = r[0];
 }
 
+uint8_t test = 0;
+
 int main(){
+	uint8_t id = me();
+	int32_t i,j;
+	uint32_t p;
+
+	if(test == 0){
+		init_v2(id);
+		barrier_wait(id);
+		i = 0;
+		j = 0;
+		p = 0;
+	}
+
+	if (D==4){
+		i = test << 5; // test * 32
+		uint32_t end = MIN(i + 32,P);
+		for( ;i<end;i++){
+			for(j = 0;j<i;j++){
+				cmp_part_4d(id,j,i);
+				if(stop_part == i) break;
+				//if(stop_p[id] == i) break;
+			}
+			cmp_part_4d(id,i,i);
+		}
+	}else if (D==8){
+		i = test << 5; // test * 32
+		uint32_t end = MIN(i + 32,P);
+		for( ;i<end;i++){
+			for(j = 0;j<i;j++){
+				cmp_part_8d(id,j,i);
+				if(stop_part == i) break;
+				//if(stop_p[id] == i) break;
+			}
+			cmp_part_8d(id,i,i);
+		}
+	}else if (D==16){
+		i = test << 5; // test * 32
+		uint32_t end = MIN(i + 32,P);
+		for( ;i<end;i++){
+			for(j = 0;j<i;j++){
+				cmp_part_16d(id,j,i);
+				if(stop_part == i) break;
+				//if(stop_p[id] == i) break;
+			}
+			cmp_part_16d(id,i,i);
+		}
+	}
+
+	if(id == 0) test++;
+}
+
+int main2(){
 	uint8_t id = me();
 	init_v2(id);
 	barrier_wait(id);
@@ -38,6 +91,8 @@ int main(){
 		for(i = 0;i<p;i++){
 			for(j = 0;j<i;j++){
 				cmp_part_4d(id,j,i);
+				if(stop_part == i) break;
+				//if(stop_p[id] == i) break;
 			}
 			cmp_part_4d(id,i,i);
 		}
@@ -49,6 +104,8 @@ int main(){
 		for(i = 0;i<p;i++){
 			for(j = 0;j<i;j++){
 				cmp_part_8d(id,j,i);
+				if(stop_part == i) break;
+				//if(stop_p[id] == i) break;
 			}
 			cmp_part_8d(id,i,i);
 		}
@@ -60,6 +117,8 @@ int main(){
 		for(i = 0;i<p;i++){
 			for(j = 0;j<i;j++){
 				cmp_part_16d(id,j,i);
+				if(stop_part == i) break;
+				//if(stop_p[id] == i) break;
 			}
 			cmp_part_16d(id,i,i);
 		}

@@ -36,6 +36,9 @@ uint32_t g_ps;//global pstop
 uint32_t ps[TASKLETS];//At most 1KB, 16 * 16 * 4 => 1024 bytes
 uint32_t *qrank;
 uint32_t *qclear;
+uint32_t stop_part;
+uint32_t stop_p[TASKLETS];
+uint32_t *qrank_p[TASKLETS];
 
 void popc_8b(uint8_t v, uint8_t *c){
 	//c[0] = v;
@@ -73,7 +76,9 @@ void init_v2(uint8_t id){
 		qclear = dma_alloc(32);
 
 		g_ps = 0xFFFFFFFF;
+		stop_part = P;
 	}
+	qrank_p[id] = dma_alloc(32);
 	ps[id] = 0xFFFFFFFF;
 	barrier_wait(id);
 
@@ -109,28 +114,28 @@ void calc_active_p(uint8_t id){
 //After comparing two partitions find global p_stop and store update flags for alive points into MRAM
 void acc_results(uint8_t id, uint32_t qflag_addr){
 
-#ifdef COMPUTE_GLOBAL_PSTOP
+	#ifdef COMPUTE_GLOBAL_PSTOP
 	if(id < 8) ps[id] = MIN(ps[id],ps[id+8]);//Reduce pstop values
-#endif
+	#endif
 	barrier_wait(id);
 
-#ifdef COMPUTE_GLOBAL_PSTOP
+	#ifdef COMPUTE_GLOBAL_PSTOP
 	if(id < 4) ps[id] = MIN(ps[id],ps[id+4]);//Reduce pstop values
-#endif
+	#endif
 	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16); //Merge flags
 	barrier_wait(id);
 
-#ifdef COMPUTE_GLOBAL_PSTOP
+	#ifdef COMPUTE_GLOBAL_PSTOP
 	if(id < 2) ps[id] = MIN(ps[id],ps[id+2]);//Reduce pstop values
-#endif
+	#endif
 	if(id < 8) qflag[id] = mflags[id << 1];//Merge flags
 	barrier_wait(id);
 
 	if(id == 0){
-#ifdef COMPUTE_GLOBAL_PSTOP
+	#ifdef COMPUTE_GLOBAL_PSTOP
 		ps[id] = MIN(ps[id],ps[id+1]);//Reduce pstop values
 		g_ps = MIN(ps[id],g_ps);//Reduce pstop values
-#endif
+	#endif
 		mram_ll_write32(qflag,qflag_addr);//Write compute flags to MRAM
 	}
 }
@@ -195,6 +200,18 @@ void load_part_16d(uint16_t cpart_i, uint32_t *buffer){
 
 void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 #ifdef COMPUTE_GLOBAL_PSTOP
+	/*uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
+	mram_ll_read32(qrank_addr,qrank_p[id]);
+
+	if( g_ps <= qrank[0] ){
+		stop_p[id] = cpart_j;
+		if (id == 0){
+			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
+			mram_ll_write32(qclear,qflag_addr);
+		}
+		return;
+	}*/
+
 	if(id == 0){
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
 		mram_ll_read32(qrank_addr,qrank);
@@ -202,10 +219,12 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 
 	if( g_ps <= qrank[0] ){
+		stop_part=cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
 			mram_ll_write32(qclear,qflag_addr);
 		}
+		barrier_wait(id);
 		return ;
 	}
 #endif
@@ -308,6 +327,17 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 
 void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 #ifdef COMPUTE_GLOBAL_PSTOP
+	/*uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
+	mram_ll_read32(qrank_addr,qrank_p[id]);
+	if( g_ps <= qrank[0] ){
+		stop_p[id] = cpart_j;
+		if (id == 0){
+			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
+			mram_ll_write32(qclear,qflag_addr);
+		}
+		return;
+	}*/
+
 	if(id == 0){
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
 		mram_ll_read32(qrank_addr,qrank);
@@ -315,10 +345,12 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 
 	if( g_ps <= qrank[0] ){
+		stop_part=cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
 			mram_ll_write32(qclear,qflag_addr);
 		}
+		barrier_wait(id);
 		return ;
 	}
 #endif
@@ -425,6 +457,16 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 
 void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 #ifdef COMPUTE_GLOBAL_PSTOP
+	/*uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
+	mram_ll_read32(qrank_addr,qrank_p[id]);
+	if( g_ps <= qrank[0] ){
+		stop_p[id] = cpart_j;
+		if (id == 0){
+			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
+			mram_ll_write32(qclear,qflag_addr);
+		}
+		return;
+	}*/
 	if(id == 0){
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
 		mram_ll_read32(qrank_addr,qrank);
@@ -432,10 +474,12 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 
 	if( g_ps <= qrank[0] ){
+		stop_part=cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
 			mram_ll_write32(qclear,qflag_addr);
 		}
+		barrier_wait(id);
 		return ;
 	}
 #endif

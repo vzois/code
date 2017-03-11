@@ -5,6 +5,7 @@ from heapq import nsmallest
 import math
 import operator
 import time
+import sys
 
 from mbin import storeDSkyData
 from skydata import scale
@@ -22,6 +23,7 @@ parts_b=list()
 dt_num_red = 0
 dt_num = 0
 
+sys.setrecursionlimit(100000)
 
 def pfmtb(v):
     return "{0:#0{1}x}".format(v,10)
@@ -265,7 +267,7 @@ def dskyline():
         
         l = rp[0] if minC else (rp[0] - (D-1)*scale)#compute level based on monotone function
         if g_ps <= l:#if level greater than or equal to the global pstop then all partitions including this are pruned
-            print "Stoping on: <g_ps>=",hex(g_ps),",<level>=",hex(rp[0]),",<first point of part>=",[hex(d) for d in  pp[0]]
+            print "Stoping on [",part_index,"]: <g_ps>=",hex(g_ps),",<level>=",hex(rp[0]),",<first point of part>=",[hex(d) for d in  pp[0]]
             break
         early_stop+=1
         
@@ -307,7 +309,7 @@ def dskyline():
         if (len(gsky_i) > 0):
             count_part_alive+=1
             
-        if (part_index < 2 or (len(gsky_i) > 0)) and True:#debugging data
+        if (part_index < 10 and (len(gsky_i) > 0)) and True:#debugging data
             print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
             bit_vectors(gsky_i)
@@ -324,7 +326,7 @@ def dskyline():
 
 print "Generating data...."    
 fp = open("common/config.h","r")
-distr="i"
+distr="c"
 for line in fp.readlines():
 #print line
     if line.strip().startswith("#define DATA_N"):
@@ -346,6 +348,16 @@ for line in fp.readlines():
         distr = line.strip().split(" ")[2][1]
 
 fp.close()    
+
+def part_cmp_count(P,DPUS):
+    Pc = P/DPUS
+    M = DPUS-1
+    count = 2 * M + 1
+    mt = (Pc - 2)/2
+    print "mt:",mt
+    count += mt * ((2 * M + 1) + (2 * M + 2))
+    print "xx:",((2 * M + 1) + (2 * M + 2))
+    return count
         
 print "scale factor:",scale    
 
@@ -359,7 +371,7 @@ if minC:
 else:
     rank = [sum(points[i]) for i in range(N)]
 
-if True:
+if False:
     dskyline_t = time.time()
     createPartitions(points,rank)
     dskyline()
@@ -388,14 +400,18 @@ dpus = 2048
 part_n = (N*dpus)/PSIZE
 part_1 = N/PSIZE
 print "dpus used:",dpus
-print "single dpu partition count on complete data:",part_n
-print "multi dpu partition count on complete data:",part_1
+print "partition count:",part_1
+print "partition comparison count:", sum([i for i in range(1,part_1+1)])
+#print "single dpu partition count on complete data:",part_n
+#print "multi dpu partition count on complete data:",part_1
 
-cmp_single_dpu = spiral(N/PSIZE,1)
-cmp_multi_dpu = spiral((N*dpus)/PSIZE,2048)
-print "single dpu comparison count:",cmp_single_dpu
-print "multi dpu comparison count:",cmp_multi_dpu
+cmp_single_dpu = spiral(8192,2048)
+#cmp_multi_dpu = spiral((N*dpus)/PSIZE,2048)
+print "assignment dpu comparison count:",cmp_single_dpu
+#print "equation dpu comparison count:",part_cmp_count(8192,2048)
+#print "multi dpu comparison count:",cmp_multi_dpu
 
+print "---------------------------------------------"
 storeDSkyData(parts_p,parts_r,parts_i,parts_b)
 
 
