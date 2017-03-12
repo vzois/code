@@ -5,8 +5,8 @@
 #define MAX(x,y) (x > y ? x : y)
 
 //Dataset Configuration
-#define DISTR "a"
-#define DATA_N 524288
+#define DISTR "i"
+#define DATA_N 8192
 #define DPUS 1
 #define N (DATA_N / DPUS)
 #define D 4

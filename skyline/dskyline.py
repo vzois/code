@@ -108,15 +108,54 @@ def createBitVectors(points):
         p_vecs.append(vecs)      
     
     return p_vecs
-   
+  
+def sortSplit(points,lvl):
+    global N,D,P,parts_p,parts_r,parts_i,parts_b
+    sumf = [sum(p) for p in points]
+    minf = [min(p) for p in points]
+    indices = [i for i in range(N)]
+    p_vecs=createBitVectors(points)
+    p =[[indices[i],minf[i],sumf[i]] for i in range(N)]
+    p = sorted(p, key = operator.itemgetter(1,2))
+    
+    
+    count = 0
+    pp = list()
+    pr = list()
+    pi = list()
+    pb = list()
+    
+    psize = N/P
+    for v in p:
+        i = v[0]
+        pp.append(points[i])
+        pr.append(minf[i])
+        pb.append(p_vecs[i])
+        pi.append(i)
+        count+=1
+        if count == psize:
+            #print pp[0],pi[0]
+            parts_p.append(pp)
+            parts_r.append(pr)
+            parts_i.append(pi)
+            parts_b.append(pb)
+            pp=list()
+            pr=list()
+            pi=list()
+            pb=list()
+            count = 0
+    print "parts_p len:",len(parts_p)
+    print "parts_r len:",len(parts_r)
+    
 def createPartitions(points,sumf):
     global N,D,P,parts_p,parts_r,parts_i,parts_b
     x=0
     kth = N/2
     
     p_vecs=createBitVectors(points)
-    indices = [i for i in range(len(sumf))]
+    indices = [i for i in range(N)]
     split(indices,sumf,N)#Recursive split
+    #sortSplit(points,sumf)
     
     stddev = 0
     for pi in parts_i:
@@ -260,6 +299,7 @@ def dskyline():
     gsky_b = list()
     early_stop = 0
     for i in range(len(parts_p)):
+        #print "i:",i,len(parts_p),len(parts_r)
         pp=parts_p[i]#get points in the partition
         rp=parts_r[i]#get level of each point in the partition
         ip=parts_i[i]#get index of each point in the partition
@@ -373,7 +413,8 @@ else:
 
 if False:
     dskyline_t = time.time()
-    createPartitions(points,rank)
+    #createPartitions(points,rank)
+    sortSplit(points,rank)
     dskyline()
     dskyline_t = time.time() - dskyline_t
     print "dskyline elapsed time:",dskyline_t
@@ -386,7 +427,8 @@ if False:
 else:
     print "Creating Partitions..."
     createpart_t = time.time()
-    createPartitions(points,rank)
+    #createPartitions(points,rank)
+    sortSplit(points,rank)
     createpart_t = time.time() - createpart_t
     
     dskyline_t = time.time()
@@ -405,13 +447,13 @@ print "partition comparison count:", sum([i for i in range(1,part_1+1)])
 #print "single dpu partition count on complete data:",part_n
 #print "multi dpu partition count on complete data:",part_1
 
-cmp_single_dpu = spiral(8192,2048)
+cmp_single_dpu = spiral(131072,2048)
 #cmp_multi_dpu = spiral((N*dpus)/PSIZE,2048)
 print "assignment dpu comparison count:",cmp_single_dpu
 #print "equation dpu comparison count:",part_cmp_count(8192,2048)
 #print "multi dpu comparison count:",cmp_multi_dpu
 
 print "---------------------------------------------"
-storeDSkyData(parts_p,parts_r,parts_i,parts_b)
+#storeDSkyData(parts_p,parts_r,parts_i,parts_b)
 
 

@@ -212,13 +212,13 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		return;
 	}*/
 
-	if(id == 0){
+	if(id == 0){//Load level of first points in the partition
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
 		mram_ll_read32(qrank_addr,qrank);
 	}
 	barrier_wait(id);
 
-	if( g_ps <= qrank[0] ){
+	if( g_ps <= qrank[0] ){// If level is less than the global stop point you can stop and prune all points in the partition
 		stop_part=cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
@@ -338,13 +338,13 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		return;
 	}*/
 
-	if(id == 0){
+	if(id == 0){//Load level of first points in the partition
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
 		mram_ll_read32(qrank_addr,qrank);
 	}
 	barrier_wait(id);
 
-	if( g_ps <= qrank[0] ){
+	if( g_ps <= qrank[0] ){// If level is less than the global stop point you can stop and prune all points in the partition
 		stop_part=cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
@@ -467,13 +467,13 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		}
 		return;
 	}*/
-	if(id == 0){
+	if(id == 0){//Load level of first points in the partition
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
 		mram_ll_read32(qrank_addr,qrank);
 	}
 	barrier_wait(id);
 
-	if( g_ps <= qrank[0] ){
+	if( g_ps <= qrank[0] ){// If level is less than the global stop point you can stop and prune all points in the partition
 		stop_part=cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);

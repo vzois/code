@@ -26,7 +26,7 @@ void count_sky_points(uint32_t p){//Debug Only
 
 uint8_t test = 0;
 
-int main2(){
+int main(){
 	uint8_t id = me();
 	int32_t i,j;
 	uint32_t p;
@@ -62,8 +62,8 @@ int main2(){
 			cmp_part_8d(id,i,i);
 		}
 	}else if (D==16){
-		i = test << 5; // test * 32
-		uint32_t end = MIN(i + 32,P);
+		i = test * 4; // test * 32
+		uint32_t end = MIN(i + 4,P);
 		for( ;i<end;i++){
 			for(j = 0;j<i;j++){
 				cmp_part_16d(id,j,i);
@@ -75,9 +75,10 @@ int main2(){
 	}
 
 	if(id == 0) test++;
+	return 0;
 }
 
-int main(){
+int main2(){
 	uint8_t id = me();
 	init_v2(id);
 	barrier_wait(id);
