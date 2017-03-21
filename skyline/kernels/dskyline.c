@@ -40,8 +40,8 @@ int main2(){
 	}
 
 	if (D==4){
-		i = test << 5; // test * 32
-		uint32_t end = MIN(i + 32,P);
+		i = test * 1; // test * 32
+		uint32_t end = MIN(i + 1,P);
 		for( ;i<end;i++){
 			for(j = 0;j<i;j++){
 				cmp_part_4d(id,j,i);
@@ -51,7 +51,7 @@ int main2(){
 			cmp_part_4d(id,i,i);
 		}
 	}else if (D==8){
-		i = test << 5; // test * 32
+		i = test * 32; // test * 32
 		uint32_t end = MIN(i + 32,P);
 		for( ;i<end;i++){
 			for(j = 0;j<i;j++){
