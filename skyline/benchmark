@@ -1,0 +1,11 @@
+python dskyline.py
+make clean 
+make dsky
+
+D=8
+N=16386
+
+echo "Input:" $N,$D
+echo "Running Simulator..."
+dpushell -s dsky_test_64.sh > out
+python gather_cycles.py independent

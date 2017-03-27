@@ -6,12 +6,12 @@ void count_sky_points(uint32_t p){//Debug Only
 	uint32_t pflag_offset = DSKY_FLAGS_ADDR;
 
 	//uint32_t *pflag = pflags[0];
-	uint32_t *r = dma_alloc(4);
-	uint32_t *rp = dma_alloc(P << 2);
+	uint32_t *r = mem_alloc_dma(4);
+	uint32_t *rp = mem_alloc_dma(P << 2);
 	r[0] = 0;
 	for(i = 0;i<p;i++){
 		rp[i] = r[0];
-		mram_ll_read32(pflag_offset,pflag);
+		mram_read32(pflag_offset,pflag);
 		for(j = 0; j < 8;j++){
 
 			popC(pflag[j],r);
@@ -20,7 +20,7 @@ void count_sky_points(uint32_t p){//Debug Only
 
 		pflag_offset+=32;
 	}
-	mram_ll_write128(rp,0);
+	mram_write128(rp,0);
 	debug = r[0];
 }
 
@@ -33,10 +33,10 @@ int main2(){
 
 	if(test == 0){
 		init_v2(id);
-		barrier_wait(id);
 		i = 0;
 		j = 0;
 		p = 0;
+		barrier_wait(id);
 	}
 
 	if (D==4){
@@ -51,8 +51,8 @@ int main2(){
 			cmp_part_4d(id,i,i);
 		}
 	}else if (D==8){
-		i = test * 32; // test * 32
-		uint32_t end = MIN(i + 32,P);
+		i = test * 1; // test * 32
+		uint32_t end = MIN(i + 1,P);
 		for( ;i<end;i++){
 			for(j = 0;j<i;j++){
 				cmp_part_8d(id,j,i);
@@ -62,8 +62,8 @@ int main2(){
 			cmp_part_8d(id,i,i);
 		}
 	}else if (D==16){
-		i = test * 4; // test * 32
-		uint32_t end = MIN(i + 4,P);
+		i = test * 1; // test * 32
+		uint32_t end = MIN(i + 1,P);
 		for( ;i<end;i++){
 			for(j = 0;j<i;j++){
 				cmp_part_16d(id,j,i);
@@ -74,6 +74,7 @@ int main2(){
 		}
 	}
 
+	barrier_wait(id);
 	if(id == 0) test++;
 	return 0;
 }

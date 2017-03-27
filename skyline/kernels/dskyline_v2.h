@@ -1,6 +1,7 @@
 #include<defs.h>
 #include<alloc.h>
-#include <mram_ll.h>
+//#include <mram_ll.h>
+#include <mram.h>
 #include <built_ins.h>
 
 #include "../common/config.h"
@@ -66,19 +67,19 @@ void init_v2(uint8_t id){
 	uint32_t i = 0;
 
 	if(id < 1){
-		pflag = dma_alloc(32);
-		qflag = dma_alloc(32);
-		window = dma_alloc(PSIZE_BYTES);
-		Cj = dma_alloc(PSIZE_BYTES);
-		pbvec = dma_alloc(PSIZE << 2);
-		qbvec = dma_alloc(PSIZE << 2);
-		qrank = dma_alloc(32);
-		qclear = dma_alloc(32);
+		pflag = mem_alloc_dma(32);
+		qflag = mem_alloc_dma(32);
+		window = mem_alloc_dma(PSIZE_BYTES);
+		Cj = mem_alloc_dma(PSIZE_BYTES);
+		pbvec = mem_alloc_dma(PSIZE << 2);
+		qbvec = mem_alloc_dma(PSIZE << 2);
+		qrank = mem_alloc_dma(32);
+		qclear = mem_alloc_dma(32);
 
 		g_ps = 0xFFFFFFFF;
 		stop_part = P;
 	}
-	qrank_p[id] = dma_alloc(32);
+	qrank_p[id] = mem_alloc_dma(32);
 	ps[id] = 0xFFFFFFFF;
 	barrier_wait(id);
 
@@ -89,7 +90,7 @@ void init_v2(uint8_t id){
 	uint32_t low = (id * P)/TASKLETS;
 	uint32_t high = ((id+1) * P)/TASKLETS;
 	for(i = low;i<high;i++){
-		mram_ll_write32(pflag,pflag_offset);
+		mram_write32(pflag,pflag_offset);
 		pflag_offset+=32;
 	}
 
@@ -136,7 +137,7 @@ void acc_results(uint8_t id, uint32_t qflag_addr){
 		ps[id] = MIN(ps[id],ps[id+1]);//Reduce pstop values
 		g_ps = MIN(ps[id],g_ps);//Reduce pstop values
 	#endif
-		mram_ll_write32(qflag,qflag_addr);//Write compute flags to MRAM
+		mram_write32(qflag,qflag_addr);//Write compute flags to MRAM
 	}
 }
 
@@ -144,77 +145,77 @@ void load_part_t(uint16_t cpart_i, uint32_t *buffer, uint8_t id){
 	uint32_t offset = id << 10;
 	uint32_t ppos_i = cpart_i << PSIZE_SHF;//Position of partition i
 	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i ) * D)<<2 );//Partition i starting addr
-	mram_ll_read1024_new(i_addr + offset, &buffer[offset >> 2]);
+	mram_read1024(i_addr + offset, &buffer[offset >> 2]);
 }
 
 void load_part_4d(uint16_t cpart_i, uint32_t *buffer){
 	uint32_t ppos_i = cpart_i << PSIZE_SHF;//Position of partition i
 	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i ) * D)<<2 );//Partition i starting addr
-	mram_ll_read1024_new(i_addr, &buffer[0]);
-	mram_ll_read1024_new(i_addr + 1024, &buffer[256]);
-	mram_ll_read1024_new(i_addr + 2048, &buffer[512]);
-	mram_ll_read1024_new(i_addr + 3072, &buffer[768]);
+	mram_read1024(i_addr, &buffer[0]);
+	mram_read1024(i_addr + 1024, &buffer[256]);
+	mram_read1024(i_addr + 2048, &buffer[512]);
+	mram_read1024(i_addr + 3072, &buffer[768]);
 }
 
 void load_part_8d(uint16_t cpart_i, uint32_t *buffer){
 	uint32_t ppos_i = cpart_i << PSIZE_SHF;//Position of partition i
 	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i ) * D)<<2 );//Partition i starting addr
-	mram_ll_read1024_new(i_addr, &buffer[0]);//0
-	mram_ll_read1024_new(i_addr + 1024, &buffer[256]);//1
-	mram_ll_read1024_new(i_addr + 2048, &buffer[512]);//2
-	mram_ll_read1024_new(i_addr + 3072, &buffer[768]);//3
-	mram_ll_read1024_new(i_addr + 4096, &buffer[1024]);//4
-	mram_ll_read1024_new(i_addr + 5120, &buffer[1280]);//5
-	mram_ll_read1024_new(i_addr + 6144, &buffer[1536]);//6
-	mram_ll_read1024_new(i_addr + 7168, &buffer[1792]);//7
+	mram_read1024(i_addr, &buffer[0]);//0
+	mram_read1024(i_addr + 1024, &buffer[256]);//1
+	mram_read1024(i_addr + 2048, &buffer[512]);//2
+	mram_read1024(i_addr + 3072, &buffer[768]);//3
+	mram_read1024(i_addr + 4096, &buffer[1024]);//4
+	mram_read1024(i_addr + 5120, &buffer[1280]);//5
+	mram_read1024(i_addr + 6144, &buffer[1536]);//6
+	mram_read1024(i_addr + 7168, &buffer[1792]);//7
 }
 
 void load_part_8d_t(uint16_t cpart_i, uint32_t *buffer, uint8_t id){
 	uint32_t offset = id * 1024;
 	uint32_t ppos_i = cpart_i << PSIZE_SHF;//Position of partition i
 	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i ) * D)<<2 );//Partition i starting addr
-	mram_ll_read1024_new(i_addr + offset, &buffer[offset >> 2]);
+	mram_read1024(i_addr + offset, &buffer[offset >> 2]);
 }
 
 void load_part_16d(uint16_t cpart_i, uint32_t *buffer){
 	uint32_t ppos_i = cpart_i << PSIZE_SHF;//Position of partition i
 	uint32_t i_addr = DSKY_POINTS_ADDR + ( (( ppos_i ) * D)<<2 );//Partition i starting addr
-	mram_ll_read1024_new(i_addr, &buffer[0]);//0
-	mram_ll_read1024_new(i_addr + 1024, &buffer[256]);//1
-	mram_ll_read1024_new(i_addr + 2048, &buffer[512]);//2
-	mram_ll_read1024_new(i_addr + 3072, &buffer[768]);//3
-	mram_ll_read1024_new(i_addr + 4096, &buffer[1024]);//4
-	mram_ll_read1024_new(i_addr + 5120, &buffer[1280]);//5
-	mram_ll_read1024_new(i_addr + 6144, &buffer[1536]);//6
-	mram_ll_read1024_new(i_addr + 7168, &buffer[1792]);//7
+	mram_read1024(i_addr, &buffer[0]);//0
+	mram_read1024(i_addr + 1024, &buffer[256]);//1
+	mram_read1024(i_addr + 2048, &buffer[512]);//2
+	mram_read1024(i_addr + 3072, &buffer[768]);//3
+	mram_read1024(i_addr + 4096, &buffer[1024]);//4
+	mram_read1024(i_addr + 5120, &buffer[1280]);//5
+	mram_read1024(i_addr + 6144, &buffer[1536]);//6
+	mram_read1024(i_addr + 7168, &buffer[1792]);//7
 
-	mram_ll_read1024_new(i_addr + 8192, &buffer[2048]);//8
-	mram_ll_read1024_new(i_addr + 9216, &buffer[2304]);//9
-	mram_ll_read1024_new(i_addr + 10240, &buffer[2560]);//10
-	mram_ll_read1024_new(i_addr + 11264, &buffer[2816]);//11
-	mram_ll_read1024_new(i_addr + 12288, &buffer[3072]);//12
-	mram_ll_read1024_new(i_addr + 13312, &buffer[3328]);//13
-	mram_ll_read1024_new(i_addr + 14336, &buffer[3584]);//14
-	mram_ll_read1024_new(i_addr + 15360, &buffer[3840]);//15
+	mram_read1024(i_addr + 8192, &buffer[2048]);//8
+	mram_read1024(i_addr + 9216, &buffer[2304]);//9
+	mram_read1024(i_addr + 10240, &buffer[2560]);//10
+	mram_read1024(i_addr + 11264, &buffer[2816]);//11
+	mram_read1024(i_addr + 12288, &buffer[3072]);//12
+	mram_read1024(i_addr + 13312, &buffer[3328]);//13
+	mram_read1024(i_addr + 14336, &buffer[3584]);//14
+	mram_read1024(i_addr + 15360, &buffer[3840]);//15
 }
 
 void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 #ifdef COMPUTE_GLOBAL_PSTOP
 	/*uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
-	mram_ll_read32(qrank_addr,qrank_p[id]);
+	mram_read32(qrank_addr,qrank_p[id]);
 
 	if( g_ps <= qrank[0] ){
 		stop_p[id] = cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-			mram_ll_write32(qclear,qflag_addr);
+			mram_write32(qclear,qflag_addr);
 		}
 		return;
 	}*/
 
 	if(id == 0){//Load level of first points in the partition
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
-		mram_ll_read32(qrank_addr,qrank);
+		mram_read32(qrank_addr,qrank);
 	}
 	barrier_wait(id);
 
@@ -222,7 +223,7 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		stop_part=cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-			mram_ll_write32(qclear,qflag_addr);
+			mram_write32(qclear,qflag_addr);
 		}
 		barrier_wait(id);
 		return ;
@@ -240,13 +241,13 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 
 		uint32_t pflag_addr = DSKY_FLAGS_ADDR + (cpart_i << 5);
 		qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-		mram_ll_read32(pflag_addr,pflag); // read flags of window set//used by all threads//Indicate which points are alieve
-		mram_ll_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet//Indicate which points are alive
+		mram_read32(pflag_addr,pflag); // read flags of window set//used by all threads//Indicate which points are alieve
+		mram_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet//Indicate which points are alive
 
 		uint32_t pbvec_addr = DSKY_BVECS_ADDR + (cpart_i * PSIZE * 4);//Bit vector for partition i // Used for cheap DTs
 		uint32_t qbvec_addr = DSKY_BVECS_ADDR + (cpart_j * PSIZE * 4);//Bit vector for partition j // Used for cheap DTs
-		mram_ll_read1024_new(pbvec_addr,pbvec);
-		mram_ll_read1024_new(qbvec_addr,qbvec);
+		mram_read1024(pbvec_addr,pbvec);
+		mram_read1024(qbvec_addr,qbvec);
 	}
 	barrier_wait(id);
 
@@ -328,19 +329,19 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 #ifdef COMPUTE_GLOBAL_PSTOP
 	/*uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
-	mram_ll_read32(qrank_addr,qrank_p[id]);
+	mram_read32(qrank_addr,qrank_p[id]);
 	if( g_ps <= qrank[0] ){
 		stop_p[id] = cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-			mram_ll_write32(qclear,qflag_addr);
+			mram_write32(qclear,qflag_addr);
 		}
 		return;
 	}*/
 
 	if(id == 0){//Load level of first points in the partition
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
-		mram_ll_read32(qrank_addr,qrank);
+		mram_read32(qrank_addr,qrank);
 	}
 	barrier_wait(id);
 
@@ -348,7 +349,7 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		stop_part=cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-			mram_ll_write32(qclear,qflag_addr);
+			mram_write32(qclear,qflag_addr);
 		}
 		barrier_wait(id);
 		return ;
@@ -366,13 +367,13 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 
 		uint32_t pflag_addr = DSKY_FLAGS_ADDR + (cpart_i << 5);
 		qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-		mram_ll_read32(pflag_addr,pflag); // read flags of window set//used by all threads
-		mram_ll_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet
+		mram_read32(pflag_addr,pflag); // read flags of window set//used by all threads
+		mram_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet
 
 		uint32_t pbvec_addr = DSKY_BVECS_ADDR + (cpart_i * 256 * 4);
 		uint32_t qbvec_addr = DSKY_BVECS_ADDR + (cpart_j * 256 * 4);
-		mram_ll_read1024_new(pbvec_addr,pbvec);
-		mram_ll_read1024_new(qbvec_addr,qbvec);
+		mram_read1024(pbvec_addr,pbvec);
+		mram_read1024(qbvec_addr,qbvec);
 	}
 	barrier_wait(id);
 
@@ -458,18 +459,18 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 #ifdef COMPUTE_GLOBAL_PSTOP
 	/*uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
-	mram_ll_read32(qrank_addr,qrank_p[id]);
+	mram_read32(qrank_addr,qrank_p[id]);
 	if( g_ps <= qrank[0] ){
 		stop_p[id] = cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-			mram_ll_write32(qclear,qflag_addr);
+			mram_write32(qclear,qflag_addr);
 		}
 		return;
 	}*/
 	if(id == 0){//Load level of first points in the partition
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
-		mram_ll_read32(qrank_addr,qrank);
+		mram_read32(qrank_addr,qrank);
 	}
 	barrier_wait(id);
 
@@ -477,7 +478,7 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		stop_part=cpart_j;
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-			mram_ll_write32(qclear,qflag_addr);
+			mram_write32(qclear,qflag_addr);
 		}
 		barrier_wait(id);
 		return ;
@@ -494,13 +495,13 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 
 		uint32_t pflag_addr = DSKY_FLAGS_ADDR + (cpart_i << 5);
 		qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-		mram_ll_read32(pflag_addr,pflag); // read flags of C_i set//used by all threads
-		mram_ll_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet
+		mram_read32(pflag_addr,pflag); // read flags of C_i set//used by all threads
+		mram_read32(qflag_addr,qflag); // read flags of C_j set//need to extract portion of tasklet
 
 		uint32_t pbvec_addr = DSKY_BVECS_ADDR + (cpart_i * 256 * 4);
 		uint32_t qbvec_addr = DSKY_BVECS_ADDR + (cpart_j * 256 * 4);
-		mram_ll_read1024_new(pbvec_addr,pbvec);
-		mram_ll_read1024_new(qbvec_addr,qbvec);
+		mram_read1024(pbvec_addr,pbvec);
+		mram_read1024(qbvec_addr,qbvec);
 	}
 	barrier_wait(id);
 
@@ -606,7 +607,7 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 	if(id < 8) qflag[id] = mflags[id << 1];
 	barrier_wait(id);
-	if(id==0) mram_ll_write32(qflag,qflag_addr);*/
+	if(id==0) mram_write32(qflag,qflag_addr);*/
 }
 
 #endif

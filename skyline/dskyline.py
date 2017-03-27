@@ -387,7 +387,7 @@ for line in fp.readlines():
     elif line.strip().startswith("#define DISTR"):
         distr = line.strip().split(" ")[2][1]
 
-fp.close()    
+fp.close()
 
 def part_cmp_count(P,DPUS):
     Pc = P/DPUS
