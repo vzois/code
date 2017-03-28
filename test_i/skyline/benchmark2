@@ -1,0 +1,19 @@
+make clean
+make purge
+make dsky
+
+output=acc
+script=dsky_test_512.sh
+
+for i in {1..4}
+do
+python dskyline.py
+echo "Running Simulator..."
+dpushell -s $script > out
+python gather_cycles.py independent >> $output
+done
+
+
+cat $output
+rm $output
+wc -l out
