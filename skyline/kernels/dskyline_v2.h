@@ -81,6 +81,7 @@ void init_v2(uint8_t id){
 	}
 	qrank_p[id] = mem_alloc_dma(32);
 	ps[id] = 0xFFFFFFFF;
+	stop_p[id] = P;
 	barrier_wait(id);
 
 	if (id < 8) pflag[id] = 0xFFFFFFFF;
@@ -199,20 +200,8 @@ void load_part_16d(uint16_t cpart_i, uint32_t *buffer){
 	mram_read1024(i_addr + 15360, &buffer[3840]);//15
 }
 
-void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
+uint8_t cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 #ifdef COMPUTE_GLOBAL_PSTOP
-	/*uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
-	mram_read32(qrank_addr,qrank_p[id]);
-
-	if( g_ps <= qrank[0] ){
-		stop_p[id] = cpart_j;
-		if (id == 0){
-			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-			mram_write32(qclear,qflag_addr);
-		}
-		return;
-	}*/
-
 	if(id == 0){//Load level of first points in the partition
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
 		mram_read32(qrank_addr,qrank);
@@ -220,13 +209,13 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 
 	if( g_ps <= qrank[0] ){// If level is less than the global stop point you can stop and prune all points in the partition
-		stop_part=cpart_j;
+		//stop_p[id]=MIN(cpart_j,stop_p[id]);
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
 			mram_write32(qclear,qflag_addr);
 		}
 		barrier_wait(id);
-		return ;
+		return 0;
 	}
 #endif
 
@@ -324,21 +313,12 @@ void cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 	mflags[id] = tflag;
 	acc_results(id,qflag_addr);//accumulate pstop // merge flags to update alive points
+	barrier_wait(id);
+	return 1;
 }
 
-void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
+uint8_t cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 #ifdef COMPUTE_GLOBAL_PSTOP
-	/*uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
-	mram_read32(qrank_addr,qrank_p[id]);
-	if( g_ps <= qrank[0] ){
-		stop_p[id] = cpart_j;
-		if (id == 0){
-			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-			mram_write32(qclear,qflag_addr);
-		}
-		return;
-	}*/
-
 	if(id == 0){//Load level of first points in the partition
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
 		mram_read32(qrank_addr,qrank);
@@ -346,13 +326,13 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 
 	if( g_ps <= qrank[0] ){// If level is less than the global stop point you can stop and prune all points in the partition
-		stop_part=cpart_j;
+		stop_p[id]=MIN(cpart_j,stop_p[id]);
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
 			mram_write32(qclear,qflag_addr);
 		}
 		barrier_wait(id);
-		return ;
+		return 0;
 	}
 #endif
 	uint32_t qflag_addr;
@@ -454,20 +434,11 @@ void cmp_part_8d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 	mflags[id] = tflag;
 	acc_results(id,qflag_addr);
+	return 1;
 }
 
-void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
+uint8_t cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 #ifdef COMPUTE_GLOBAL_PSTOP
-	/*uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
-	mram_read32(qrank_addr,qrank_p[id]);
-	if( g_ps <= qrank[0] ){
-		stop_p[id] = cpart_j;
-		if (id == 0){
-			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
-			mram_write32(qclear,qflag_addr);
-		}
-		return;
-	}*/
 	if(id == 0){//Load level of first points in the partition
 		uint32_t qrank_addr = DSKY_RANK_ADDR + (cpart_j * PSIZE * 4);
 		mram_read32(qrank_addr,qrank);
@@ -475,13 +446,13 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 
 	if( g_ps <= qrank[0] ){// If level is less than the global stop point you can stop and prune all points in the partition
-		stop_part=cpart_j;
+		stop_p[id]=MIN(cpart_j,stop_p[id]);
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
 			mram_write32(qclear,qflag_addr);
 		}
 		barrier_wait(id);
-		return ;
+		return 0;
 	}
 #endif
 	uint32_t qflag_addr;
@@ -540,14 +511,6 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			uint8_t Mj = (pbvec[vj_offset] & 0xFFFF);//16 bit vector
 			uint8_t Qj = (pbvec[vj_offset] & 0xFFFF0000) >> 16;
 
-			/*if ((Mj | Mi) > Mi) continue;
-			uint8_t ci = pc[Mi & 0xFF] + pc[Mi>>8];
-			uint8_t cj = pc[Mj & 0xFF] + pc[Mj>>8];
-			if(ci < cj) continue;
-			else if((ci == cj) & (Mj != Mi)) continue;
-			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
-			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;*/
-
 			#ifndef USE_INTRINSIC_FUNCTION
 			if ((Mj | Mi) > Mi) continue;
 			else if(pc[Mi] < pc[Mj]) continue;
@@ -573,7 +536,7 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			}
 		}
 #ifdef COMPUTE_GLOBAL_PSTOP
-		if(dt == 0 && (cpart_i == cpart_j)){
+		if(dt == 0){
 			uint32_t mx_0,mx_1,mx_2,mx_3,mx_4,mx_5,mx_6,mx_7;
 			mx_0 = MAX(q[0],q[1]);
 			mx_1 = MAX(q[2],q[3]);
@@ -602,12 +565,7 @@ void cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	mflags[id] = tflag;
 	acc_results(id,qflag_addr);
 
-	/*barrier_wait(id);
-	if(id < 8) mflags[id << 1] = mflags[id << 1] | (mflags[(id << 1)+1] << 16);
-	barrier_wait(id);
-	if(id < 8) qflag[id] = mflags[id << 1];
-	barrier_wait(id);
-	if(id==0) mram_write32(qflag,qflag_addr);*/
+	return 1;
 }
 
 #endif

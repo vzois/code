@@ -512,4 +512,6 @@ boot
 boot
 boot
 boot
+print mram 0x370F000 32
+print mram 0x370F020 32
 quit

@@ -1,0 +1,1568 @@
+connecting to micron-ubuntu:8082:8080/simulator/ ...
+Starting DPU shell
+	loaded '/home/vzois/git/code/skyline/dskyline.bin'
+		TEXT << 2851 instructions
+		DATA << 5740 bytes
+	loaded '/home/vzois/git/code/skyline/runtime_data/dsky.bin'
+end of program - @PC=0x0005 (__sys_end) on thread 1 [ stop_j @$__sys_end ]
+	690642019 step(s) run
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+failed to run
+	AT PC=2@123c
+	illegal memory access
+0x0370f000 | dffe.e4eb | 1101.1111 1111.1110 1110.0100 1110.1011 | ....
+0x0370f004 | 0bcb.1486 | 0000.1011 1100.1011 0001.0100 1000.0110 | ....
+0x0370f008 | 0544.4e10 | 0000.0101 0100.0100 0100.1110 0001.0000 | .ND.
+0x0370f00c | a401.5610 | 1010.0100 0000.0001 0101.0110 0001.0000 | .V..
+0x0370f010 | 0403.8001 | 0000.0100 0000.0011 1000.0000 0000.0001 | ....
+0x0370f014 | 8005.c080 | 1000.0000 0000.0101 1100.0000 1000.0000 | ....
+0x0370f018 | 0000.1a00 | 0000.0000 0000.0000 0001.1010 0000.0000 | ....
+0x0370f01c | 0404.0340 | 0000.0100 0000.0100 0000.0011 0100.0000 | @...
+0x0370f020 | 08ea.60c8 | 0000.1000 1110.1010 0110.0000 1100.1000 | .`..
+0x0370f024 | 0a00.4380 | 0000.1010 0000.0000 0100.0011 1000.0000 | .C..
+0x0370f028 | 3024.02a0 | 0011.0000 0010.0100 0000.0010 1010.0000 | ..$0
+0x0370f02c | 0000.0000 | 0000.0000 0000.0000 0000.0000 0000.0000 | ....
+0x0370f030 | 40c2.4108 | 0100.0000 1100.0010 0100.0001 0000.1000 | .A.@
+0x0370f034 | 0108.9000 | 0000.0001 0000.1000 1001.0000 0000.0000 | ....
+0x0370f038 | 0205.0031 | 0000.0010 0000.0101 0000.0000 0011.0001 | 1...
+0x0370f03c | 0400.3000 | 0000.0100 0000.0000 0011.0000 0000.0000 | .0..
+[34m	        _____[0m
+[34m	       |  __ \ [0m
+[34m	  _   _| |__) |[0m
+[34m	 | | | |  ___/ [35m'_ ` _ \ / _ \ '_ ` _ \[0m
+[34m	 | |_| | |   [35m| | | | | |  __/ | | | | |[0m
+[34m	  \__,_|_| [35m  |_| |_| |_|\___|_| |_| |_|[0m
+
+DPU Shell - version 2017.1.1-EAP - Copyright (c) 2014-2017 - uPmem[0m
+Licensed to: UCRiverside[0m
+Type 'help' for help on commands[0m
+[0m

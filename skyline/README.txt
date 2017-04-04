@@ -72,11 +72,9 @@ The last command prints the flags for the points in the first partition. You can
 compare the values printed by dskyline.py with these values to check the results.
 You can also move to the next partition 0x370F020 32 to check the values there too.
 
+####################
+##ADDITIONAL NOTES##
+####################
 
-
-
-
- 
-
-
-
+Benchmarking the implementation using the simulator, requires generating the dsky.bin file. This file is created
+after preprocessing the randomly generated input of a given size. It includes 

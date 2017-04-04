@@ -48,8 +48,8 @@ def genData(N,D,distr):
     infile = filename+".bin"
     outfile=filename+".csv"
     f = open(infile,"rb")
-    fw = open(outfile,"w")
-    print "Creating csv: ",infile, N, D, ">>>>", outfile
+    #fw = open(outfile,"w")
+    #print "Creating csv: ",infile, N, D, ">>>>", outfile
 
     point_num = 1024*32
     buffer = f.read(point_num*D)
@@ -64,10 +64,10 @@ def genData(N,D,distr):
             points.append(list(data[i:i+D]))    
             lines.append(",".join([str(v) for v in data[i:i+D]]))
             lines.append("\n")
-        fw.writelines(lines)
+        #fw.writelines(lines)
         buffer = f.read(point_num*D)
     f.close()
-    fw.close()
+    #fw.close()
     return points
 
 

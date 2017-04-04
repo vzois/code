@@ -79,9 +79,9 @@ clean:
 	rm -rf $(HOST_EXEC)
 	rm -rf dskyline.bin
 	rm -rf dskyline.syms
+	rm -rf d_*
 
 purge:
-	rm -rf d_*
 	rm -rf runtime_data/points.bin
 	rm -rf runtime_data/sum.bin
 	rm -rf candidates0.bin
