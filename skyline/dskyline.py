@@ -349,7 +349,7 @@ def dskyline():
         if (len(gsky_i) > 0):
             count_part_alive+=1
             
-        if (part_index < 5 and (len(gsky_i) > 0)) and True:#debugging data
+        if (part_index < 1 and (len(gsky_i) > 0)) and True:#debugging data
             print "{",hex(g_ps),"}<",part_index,"> = [",len(gsky_i),",",hex(len(gsky_i)),"]"
             print gsky_i
             bit_vectors(gsky_i)
@@ -367,6 +367,7 @@ def dskyline():
 print "Generating data...."    
 fp = open("common/config.h","r")
 distr="c"
+remote = False
 for line in fp.readlines():
 #print line
     if line.strip().startswith("#define DATA_N"):
@@ -386,7 +387,10 @@ for line in fp.readlines():
         L = int(line.strip().split(" ")[2])
     elif line.strip().startswith("#define DISTR"):
         distr = line.strip().split(" ")[2][1]
-
+    elif line.strip().startswith("#define SEQ_DSKY"):
+        remote = False
+    elif line.strip().startswith("//#define SEQ_DSKY"):
+        remote = True
 fp.close()
 
 def part_cmp_count(P,DPUS):
@@ -454,6 +458,6 @@ print "assignment dpu comparison count:",cmp_single_dpu
 #print "multi dpu comparison count:",cmp_multi_dpu
 
 print "---------------------------------------------"
-storeDSkyData(parts_p,parts_r,parts_i,parts_b)
+storeDSkyData(parts_p,parts_r,parts_i,parts_b, remote)
 
 

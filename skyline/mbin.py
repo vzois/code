@@ -43,7 +43,7 @@ def storePoints(points,rank,window,pstop):
     
     f.close()
 
-def storeDSkyData(parts_p,parts_r,parts_i,parts_b):
+def storeDSkyData(parts_p,parts_r,parts_i,parts_b, Remote):
     Debug = False
     f = open("runtime_data/dsky.bin","wb")
     
@@ -70,6 +70,12 @@ def storeDSkyData(parts_p,parts_r,parts_i,parts_b):
         count+=1
     
     count = 0
+    
+    #REMOTE POINT RESERVATION
+    if Remote:
+        for i in range(512):
+            for j in range(len(parts_p[0])):
+                f.write(struct.pack('I', 0))
 
     print "Storing ranks in partitions!!!"    
     for pr in parts_r:
@@ -80,6 +86,11 @@ def storeDSkyData(parts_p,parts_r,parts_i,parts_b):
         count+=1
 
     count = 0
+    
+    #REMOTE RANK RESERVATION
+    if Remote:
+        for i in range(512):
+            f.write(struct.pack('I', 0))
     
     D=len(parts_p[0][0])
     print "Storing bvectors in partitions!!!"
@@ -109,6 +120,10 @@ def storeDSkyData(parts_p,parts_r,parts_i,parts_b):
         #raw_input("Press any key to continue...")
         #break
         
+    #REMOTE BVECTOR RESERVATION
+    if Remote:
+        for i in range(512):
+            f.write(struct.pack('I', 0))   
         
         
     

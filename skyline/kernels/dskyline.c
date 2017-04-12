@@ -29,7 +29,9 @@ void count_sky_points(uint32_t p){//Debug Only
 
 uint8_t test = 0;
 #ifndef PAR_DSKY
+
 #ifdef BULK_BENCHMARK
+
 int main(){
 	uint8_t id = me();
 	int32_t i,j;
@@ -72,7 +74,9 @@ int main(){
 	if(id == 0) test++;
 	return 0;
 }
+
 #else
+
 int main(){
 	uint8_t id = me();
 	init_v2(id);
@@ -93,7 +97,7 @@ int main(){
 			cmp_part_4d(id,i,i);
 		}
 
-		for(i = stop_p[id] + id; i<P;i+=TASKLETS){
+		for(i = stop_p[id] + id; i<p;i+=TASKLETS){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (i << 5);
 			mram_write32(qclear,qflag_addr);
 		}
@@ -112,7 +116,7 @@ int main(){
 			cmp_part_8d(id,i,i);
 		}
 
-		for(i = stop_p[id] + id; i<P;i+=TASKLETS){
+		for(i = stop_p[id] + id; i<p;i+=TASKLETS){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (i << 5);
 			mram_write32(qclear,qflag_addr);
 		}
@@ -131,7 +135,7 @@ int main(){
 			cmp_part_16d(id,i,i);
 		}
 
-		for(i = stop_p[id] + id; i<P;i+=TASKLETS){
+		for(i = stop_p[id] + id; i<p;i+=TASKLETS){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (i << 5);
 			mram_write32(qclear,qflag_addr);
 		}
@@ -140,6 +144,7 @@ int main(){
 	//if(id==0) count_sky_points(P);
 	return 0;
 }
+
 #endif
 #else
 
