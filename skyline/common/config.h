@@ -5,16 +5,19 @@
 #define MAX(x,y) (x > y ? x : y)
 
 //Dataset Configuration
-#define DISTR "i"
-#define DATA_N 131072
+
+#define SEQ_DSKY //Comment to restructures addresses for Parallel DSky
+
+#define DISTR "c"
+#define DATA_N 262144
 #define DPUS 1
 #define N (DATA_N / DPUS)
-#define D 4
+#define D 8
 #define PSIZE 256 //Partition size
 #define PSIZE_BYTES ((PSIZE*D) << 2)
 #define PSIZE_SHF 8
 #define L 2 // Partition level
-#define P (DATA_N / PSIZE) // Partition number
+#define P (N / PSIZE) // Partition number
 #define K 128
 #define MERGE_CHUNK 512
 #define BVECTOR_N (N >> 5) // N/32 Bit vectors
@@ -53,10 +56,26 @@
 #define RANK_ADDR (WINDOW_ADDR + ((K * D)<<2))
 #define MASK_ADDR 0x3000000
 
+////////////////////////////////////////////
+//merging Runtime Configuration
+////////////////////////////////////////////
+//General Runtime Addresses
+#define VAR_0_ADDR 0x0
+#define VAR_1_ADDR 0x4
+#define VAR_2_ADDR 0x8
+#define VAR_3_ADDR 0xC
+#define VAR_4_ADDR 0x10
+#define VAR_5_ADDR 0x14
+#define VAR_6_ADDR 0x18
+#define VAR_7_ADDR 0x1C
+#define VAR_8_ADDR 0x20
+#define VAR_9_ADDR 0x24
 
 ////////////////////////////////////////////
 //dskyline Runtime Configuration
 ////////////////////////////////////////////
+#ifdef SEQ_DSKY
+
 #define DSKY_POINTS_ADDR 0x3000// Starting offset of point partitions
 #define DSKY_RANK_ADDR (DSKY_POINTS_ADDR + ((N * D)<<2))//Precomputed rank for each point within each partition
 #define DSKY_BVECS_ADDR (DSKY_RANK_ADDR +  (N << 2))
@@ -67,26 +86,33 @@
 #define DSKY_REMOTE_BVECS_ADDR (DSKY_REMOTE_FLAGS_ADDR + ((PSIZE/32) << 2))//bit vectors of remote partition
 #define DSKY_REMOTE_POINTS_ADDR (DSKY_REMOTE_BVECS_ADDR + (PSIZE << 2))//Remote partition during communication stage
 
+#else
+
+#define DSKY_POINTS_ADDR 0x3000// Starting offset of point partitions
+#define DSKY_RANK_ADDR (DSKY_POINTS_ADDR + (((N + 2*PSIZE) * D)<<2))//Precomputed rank for each point within each partition
+#define DSKY_BVECS_ADDR (DSKY_RANK_ADDR +  ((N + 2*PSIZE) << 2))
+#define DSKY_FLAGS_ADDR 0x370F000//Flags to determine which points are alive or not
+
+#define DSKY_REMOTE_PART_ID VAR_0_ADDR
+#define DSKY_REMOTE_POINTS_ADDR_1 (DSKY_POINTS_ADDR + ((N * D)<<2))
+#define DSKY_REMOTE_RANK_ADDR_1 (DSKY_RANK_ADDR + (N << 2))
+#define DSKY_REMOTE_BVECS_ADDR_1 (DSKY_BVECS_ADDR + (N << 2))
+#define DSKY_REMOTE_FLAGS_ADDR_1 (DSKY_FLAGS_ADDR + (P << 2))
+#define DSKY_REMOTE_PSTOP_ADDR_1 VAR_2_ADDR
+
+#define DSKY_REMOTE_POINTS_ADDR_2 (DSKY_POINTS_ADDR + ((N + PSIZE) * D)<<2))
+#define DSKY_REMOTE_RANK_ADDR_2 (DSKY_RANK_ADDR + ((N + PSIZE) << 2))
+#define DSKY_REMOTE_BVECS_ADDR_2 (DSKY_BVECS_ADDR + ((N + PSIZE) << 2))
+#define DSKY_REMOTE_FLAGS_ADDR_2 (DSKY_FLAGS_ADDR + ((P + 4) << 2))
+#define DSKY_REMOTE_PSTOP_ADDR_2 VAR_4_ADDR
+
+#endif
+
 #define POINTS_PER_T (PSIZE / TASKLETS)
 #define POINTS_PER_T_VALUES ( POINTS_PER_T * D )
 #define POINTS_PER_T_BYTES ( POINTS_PER_T_VALUES << 2)
 #define POINTS_PER_T_MSK ( (0x1 << POINTS_PER_T) - 1 )
 #define PSIZE_POINTS_VALUES (PSIZE * D)
 
-
-
-////////////////////////////////////////////
-//merging Runtime Configuration
-////////////////////////////////////////////
-
-//General Runtime Addresses
-#define VAR_0_ADDR 0x0
-#define VAR_1_ADDR 0x4
-#define VAR_2_ADDR 0x8
-#define VAR_3_ADDR 0xC
-#define VAR_4_ADDR 0x10
-#define VAR_5_ADDR 0x14
-#define VAR_6_ADDR 0x18
-#define VAR_7_ADDR 0x1C
 
 #endif

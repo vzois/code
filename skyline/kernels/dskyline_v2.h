@@ -41,6 +41,8 @@ uint32_t stop_part;
 uint32_t stop_p[TASKLETS];
 uint32_t *qrank_p[TASKLETS];
 
+uint32_t *param[TASKLETS];
+
 void popc_8b(uint8_t v, uint8_t *c){
 	//c[0] = v;
 	c[0] = v - ((v >> 1) & 0x55);
@@ -81,6 +83,7 @@ void init_v2(uint8_t id){
 	}
 	qrank_p[id] = mem_alloc_dma(32);
 	ps[id] = 0xFFFFFFFF;
+	param[id] = mem_alloc_dma(8);
 	stop_p[id] = P;
 	barrier_wait(id);
 
@@ -209,7 +212,7 @@ uint8_t cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 	barrier_wait(id);
 
 	if( g_ps <= qrank[0] ){// If level is less than the global stop point you can stop and prune all points in the partition
-		//stop_p[id]=MIN(cpart_j,stop_p[id]);
+		stop_p[id]=MIN(cpart_j,stop_p[id]);
 		if (id == 0){
 			uint32_t qflag_addr = DSKY_FLAGS_ADDR + (cpart_j << 5);
 			mram_write32(qclear,qflag_addr);
@@ -303,7 +306,7 @@ uint8_t cmp_part_4d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			}
 		}
 #ifdef COMPUTE_GLOBAL_PSTOP//minimax rule to update global pstop
-		if(dt == 0 && (cpart_i == cpart_j)){//Each tasklet local pstop//merge at acc_results
+		if(dt == 0){//Each tasklet local pstop//merge at acc_results
 			mx = MAX(MAX(q[0],q[1]),MAX(q[2],q[3]));
 			ps[id] = MIN(mx,ps[id]);
 		}
