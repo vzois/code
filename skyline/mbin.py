@@ -124,8 +124,8 @@ def storeDSkyData(parts_p,parts_r,parts_i,parts_b, Remote):
     if Remote:
         for i in range(512):
             f.write(struct.pack('I', 0))   
-        
-        
+
+def storeDSkyDataSpiral(parts_p,parts_r,parts_i,parts_b, Remote):
+    DPUS = 2048
     
-        
     

@@ -3,14 +3,14 @@ make purge
 make dsky
 
 output=acc
-script=dsky_test_512.sh
+script=dsky_test_256.sh
 
-for i in {1..1}
+for i in {1..4}
 do
 python dskyline.py
 echo "Running Simulator...("$i")"
 dpushell -s $script > out
-python gather_cycles.py correlated >> $output
+python gather_cycles.py >> $output
 done
 
 cat $output

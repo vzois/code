@@ -1,0 +1,1 @@
+python dskyline.py ; make clean ; make dsky ; dpushell -s dsky_test.sh

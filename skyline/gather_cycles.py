@@ -1,6 +1,6 @@
 import sys
 
-dataset = sys.argv[1]
+#dataset = sys.argv[1]
 f = open("out","r")
 
 lines = f.readlines()
@@ -19,5 +19,5 @@ for line in lines:
 
 f.close()
 
-print dataset
+#print dataset
 print "total cycles:",total_cycles
