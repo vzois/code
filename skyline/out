@@ -1,0 +1,8 @@
+connecting to micron-ubuntu:8082:8080/simulator/ ...
+Starting DPU shell
+	loaded '/home/vzois/git/code/skyline/dskyline.bin'
+		TEXT << 3196 instructions
+		DATA << 5816 bytes
+	loaded '/home/vzois/git/code/skyline/runtime_data/dsky.bin'
+end of program - @PC=0x0005 (__sys_end) on thread 1 [ stop_j @$__sys_end ]
+	163450 step(s) run
