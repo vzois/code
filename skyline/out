@@ -1,6 +1,0 @@
-connecting to micron-ubuntu:8082:8080/simulator/ ...
-Starting DPU shell
-	loaded '/home/vzois/git/code/skyline/dskyline.bin'
-		TEXT << 2668 instructions
-		DATA << 5804 bytes
-	loaded '/home/vzois/git/code/skyline/runtime_data/dsky.bin'
