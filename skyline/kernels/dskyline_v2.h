@@ -558,8 +558,8 @@ uint8_t cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 		uint8_t dt = 0;
 #ifdef USE_BIT_VECTORS
 		uint16_t vi_offset = (work_offset + j) >> 4;//divide index by 16
-		uint8_t Mi = (qbvec[vi_offset] & 0xFFFF);//16 bit vector
-		uint8_t Qi = (qbvec[vi_offset] & 0xFFFF0000) >> 16;
+		uint16_t Mi = (qbvec[vi_offset] & 0xFFFF);//16 bit vector
+		uint16_t Qi = (qbvec[vi_offset] & 0xFFFF0000) >> 16;
 #endif
 		for(i = 0;i<PSIZE_POINTS_VALUES; i+=D){
 #ifdef CHECK_ONLY_ACTIVE_POINTS
@@ -568,8 +568,8 @@ uint8_t cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			uint32_t *p = &window[i];
 #ifdef USE_BIT_VECTORS
 			uint16_t vj_offset = i >> 4;//divide index by 16
-			uint8_t Mj = (pbvec[vj_offset] & 0xFFFF);//16 bit vector
-			uint8_t Qj = (pbvec[vj_offset] & 0xFFFF0000) >> 16;
+			uint16_t Mj = (pbvec[vj_offset] & 0xFFFF);//16 bit vector
+			uint16_t Qj = (pbvec[vj_offset] & 0xFFFF0000) >> 16;
 
 			#ifndef USE_INTRINSIC_FUNCTION
 			if ((Mj | Mi) > Mi) continue;
