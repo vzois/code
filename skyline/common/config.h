@@ -6,13 +6,13 @@
 
 //Dataset Configuration
 
-//#define SEQ_DSKY //Comment to restructures addresses for Parallel DSky
+#define SEQ_DSKY //Comment to restructures addresses for Parallel DSky
 
-#define DISTR "i"
+#define DISTR "c"
 #define DATA_N 8192
 #define DPUS 1
 #define N ((DATA_N / DPUS))
-#define D 8
+#define D 16
 #define PSIZE 256 //Partition size
 #define PSIZE_BYTES ((PSIZE*D) << 2)
 #define PSIZE_SHF 8

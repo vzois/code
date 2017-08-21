@@ -469,7 +469,7 @@ else:
     createpart_t = time.time() - createpart_t
     
     dskyline_t = time.time()
-    #dskyline()
+    dskyline()
     dskyline_t = time.time() - dskyline_t
     print "dskyline elapsed time:",dskyline_t
     print "create partition elapsed time:",createpart_t
