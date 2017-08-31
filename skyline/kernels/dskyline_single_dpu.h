@@ -35,7 +35,9 @@ void seq_test(){
 //		//cmp_partb_4d(id,0);
 	}
 	else if(D==8){
-		for(i = 0;i<p;i++){ if(cmp_part_8d(id,i,i) == 1) break; }
+		for(i = 0;i<p;i++){ 
+			if(cmp_part_8d(id,i,i) == 1) break;
+		}
 		p = i;
 
 		for(i = 0;i<p;i++){

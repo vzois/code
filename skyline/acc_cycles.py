@@ -9,6 +9,7 @@ total_cycles = 0
 check = False
 count=0
 for line in lines:
+    #print line.strip()
     if check:
         data = line.strip().split(" ")
         cycles=long(data[0])
@@ -16,7 +17,7 @@ for line in lines:
         count+=1
         #print line, data[0]
         check = False
-    if line.strip().startswith("end") or line.strip().startswith("halted"):
+    if line.strip().startswith("End") or line.strip().startswith("Halted"):
         check = True
 
 f.close()

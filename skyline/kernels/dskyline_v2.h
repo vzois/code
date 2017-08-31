@@ -66,6 +66,61 @@ uint8_t DT_(uint32_t *p, uint32_t *q){
 								  //0x  30f 0x6084c 0x86bb6 0x8f1b3 window
 }
 
+uint8_t DT_16(uint32_t *p, uint32_t *q){
+	uint8_t i = 0;
+	
+	for(i=0;i<4;i++){
+		if( q[i] < p[i] ) return 0;
+	}
+	
+	for(i=0;i<D;i++){
+		if( p[i] < q[i] ) return 1;	
+	}
+	
+	return 0;
+}
+
+uint8_t DT_16a(uint32_t *p, uint32_t *q){
+	if(( q[0] < p[0] )) return 0;
+	if(( q[1] < p[1] )) return 0;
+	if(( q[2] < p[2] )) return 0;
+	if(( q[3] < p[3] )) return 0;
+	if(( q[4] < p[4] )) return 0;
+	if(( q[5] < p[5] )) return 0;
+	if(( q[6] < p[6] )) return 0;
+	if(( q[7] < p[7] )) return 0;
+	if(( q[8] < p[8] )) return 0;
+	if(( q[9] < p[9] )) return 0;
+	if(( q[10] < p[10] )) return 0;
+	if(( q[11] < p[11] )) return 0;
+	if(( q[12] < p[12] )) return 0;
+	if(( q[13] < p[13] )) return 0;
+	if(( q[14] < p[14] )) return 0;
+	if(( q[15] < p[15] )) return 0;
+	
+	//qb is 0 here 
+	if((p[0] < q[0] ) == 1) return 1;
+	if((p[1] < q[1] ) == 1) return 1;
+	if((p[2] < q[2] ) == 1) return 1;
+	if((p[3] < q[3] ) == 1) return 1;
+	if((p[4] < q[4] ) == 1) return 1;
+	if((p[5] < q[5] ) == 1) return 1;
+	if((p[6] < q[6] ) == 1) return 1;
+	if((p[7] < q[7] ) == 1) return 1;
+	if((p[8] < q[8] ) == 1) return 1;
+	if((p[9] < q[9] ) == 1) return 1;
+	if((p[10] < q[10] ) == 1) return 1;
+	if((p[11] < q[11] ) == 1) return 1;
+	if((p[12] < q[12] ) == 1) return 1;
+	if((p[13] < q[13] ) == 1) return 1;
+	if((p[14] < q[14] ) == 1) return 1;
+	if((p[15] < q[15] ) == 1) return 1;
+	
+	//pb is 0 here
+	return 0;
+	
+}
+
 void init_v2(uint8_t id){
 	uint32_t pflag_offset = DSKY_FLAGS_ADDR + id * (N >> 7);//offset by 1 byte for each point
 	uint32_t i = 0;
@@ -524,15 +579,44 @@ uint8_t cmp_part_16d(uint8_t id, uint16_t cpart_i, uint16_t cpart_j){
 			#endif
 			#ifdef USE_INTRINSIC_FUNCTION
 			if ((Mj | Mi) > Mi) continue;
-			uint32_t ci,cj;
+			uint8_t ci,cj;
 			__builtin_cao_rr(ci,Mi);
 			__builtin_cao_rr(cj,Mj);
+			
 			if(ci < cj) continue;
 			else if((ci == cj) & (Mj != Mi)) continue;
 			else if((Mi == Mj) & ((Qj | Qi) > Qi)) continue;
 			else if( (((Mj | ~Mi) & Qj) | Qi) > Qi) continue;
+			
+			
 			#endif
 #endif
+
+			/*if(( q[0] < p[0] )) continue;
+			if(( q[1] < p[1] )) continue;
+			if(( q[2] < p[2] )) continue;
+			if(( q[3] < p[3] )) continue;
+			if(( q[4] < p[4] )) continue;
+			if(( q[5] < p[5] )) continue;
+
+	
+			//qb is 0 here 
+			if((p[0] < q[0] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[1] < q[1] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[2] < q[2] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[3] < q[3] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[4] < q[4] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[5] < q[5] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[6] < q[6] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[7] < q[7] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[8] < q[8] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[9] < q[9] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[10] < q[10] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[11] < q[11] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[12] < q[12] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[13] < q[13] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[14] < q[14] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }
+			if((p[15] < q[15] ) == 1){ dt=1; tflag &= ~(0x1 << qbit); break; }*/
 
 			if(DT_(p,q) == 1){
 				tflag &= ~(0x1 << qbit);//Set flag for dominance
